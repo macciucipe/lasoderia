@@ -493,7 +493,7 @@ async function cargarHistorial() {
   const hoy = new Date().toISOString().split('T')[0];
   const { data } = await sb
     .from('pedidos')
-    .select('*, clientes(nombre, apellido)')
+    .select('*, clientes:cliente_id(nombre, apellido)')
     .eq('repartidor_id', repActual.id)
     .gte('created_at', hoy)
     .order('created_at', { ascending: false });
@@ -508,7 +508,9 @@ async function cargarHistorial() {
   let totalMonto = 0;
   let html = '';
   data.forEach(p => {
-    const nombre = p.clientes ? `${p.clientes.nombre} ${p.clientes.apellido}` : (p.notas?.split('.')[0] || 'Cliente directo');
+    const nombre = p.clientes ? `${p.clientes.nombre} ${p.clientes.apellido}` : 
+                   p.notas?.includes('Cliente:') ? p.notas.split('Cliente:')[1].split('.')[0].trim() : 
+                   'Cliente directo';
     totalMonto += parseFloat(p.monto_cobrado) || 0;
     html += `
       <div class="pedido-item">
