@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Sodería ATR — Soda a domicilio en Lima</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --negro: #000000;
+  --amarillo: #ffc000;
+  --azul: #0000ff;
+  --blanco: #ffffff;
+  --gris: #111111;
+  --gris-medio: #1e1e1e;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--negro);
+  color: var(--blanco);
+  font-family: 'Barlow', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--negro); }
+::-webkit-scrollbar-thumb { background: var(--amarillo); }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 3rem;
+  height: 64px;
+  background: var(--negro);
+  border-bottom: 2px solid var(--amarillo);
+}
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem; letter-spacing: 0.08em;
+  color: var(--amarillo);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--azul); }
+nav ul { display: flex; gap: 2.5rem; list-style: none; }
+nav ul a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+nav ul a:hover { color: var(--amarillo); }
+.nav-cta {
+  background: var(--amarillo);
+  color: var(--negro) !important;
+  padding: 0.5rem 1.4rem;
+  font-weight: 700 !important;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: background 0.2s !important;
+}
+.nav-cta:hover { background: var(--blanco) !important; }
+
+/* ─── HERO ─── */
+#hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 6rem 3rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero-lines {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 60px,
+      rgba(0,0,255,0.04) 60px,
+      rgba(0,0,255,0.04) 61px
+    );
+}
+.hero-left { position: relative; z-index: 2; }
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--azul);
+  color: var(--blanco);
+  font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 0.4rem 1rem;
+  margin-bottom: 1.5rem;
+}
+.hero-tag::before {
+  content: ''; width: 8px; height: 8px;
+  background: var(--amarillo);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(4rem, 9vw, 8rem);
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+  color: var(--blanco);
+  margin-bottom: 0.3rem;
+}
+h1 .amarillo { color: var(--amarillo); }
+h1 .azul { color: var(--azul); }
+.hero-sub {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.65;
+  max-width: 440px;
+  margin: 1.5rem 0 2.5rem;
+  font-weight: 400;
+}
+.hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+.btn-primary {
+  background: var(--amarillo);
+  color: var(--negro);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem; font-weight: 900;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.9rem 2.2rem;
+  text-decoration: none;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  transition: background 0.15s, transform 0.15s;
+  border: none; cursor: pointer;
+  display: inline-block;
+}
+.btn-primary:hover { background: var(--blanco); transform: translateY(-2px); }
+.btn-secondary {
+  background: transparent;
+  color: var(--blanco);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.9rem 2.2rem;
+  text-decoration: none;
+  border: 2px solid rgba(255,255,255,0.25);
+  transition: border-color 0.15s;
+  display: inline-block;
+}
+.btn-secondary:hover { border-color: var(--amarillo); color: var(--amarillo); }
+.hero-stats {
+  display: flex; gap: 2.5rem; margin-top: 3rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 2rem;
+}
+.stat-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.4rem; color: var(--amarillo);
+  line-height: 1; display: block;
+}
+.stat-l {
+  font-size: 0.72rem; color: rgba(255,255,255,0.45);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-top: 0.2rem; display: block;
+}
+
+/* Hero right — foto placeholder y badge */
+.hero-right {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%;
+}
+.hero-img-wrap {
+  width: 100%; max-width: 480px;
+  aspect-ratio: 3/4;
+  background: var(--gris-medio);
+  border: 2px solid rgba(255,192,0,0.2);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.hero-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hero-img-placeholder {
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  color: rgba(255,255,255,0.2);
+}
+.hero-img-placeholder svg { width: 64px; opacity: 0.3; }
+.hero-img-placeholder span { font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.hero-badge {
+  position: absolute; bottom: -1.5rem; left: -1.5rem;
+  background: var(--amarillo);
+  color: var(--negro);
+  padding: 1rem 1.4rem;
+  clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+}
+.hero-badge strong {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem; display: block; line-height: 1;
+}
+.hero-badge span { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ─── COMO FUNCIONA ─── */
+#como-funciona {
+  background: var(--amarillo);
+  padding: 5rem 3rem;
+}
+#como-funciona .s-label {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--negro);
+  opacity: 0.5; margin-bottom: 0.75rem;
+}
+#como-funciona h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  color: var(--negro); line-height: 0.95;
+  letter-spacing: 0.02em; margin-bottom: 3.5rem;
+}
+.pasos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  position: relative;
+}
+.pasos::before {
+  content: '';
+  position: absolute; top: 2.5rem; left: 12.5%; right: 12.5%;
+  height: 2px; background: var(--negro); opacity: 0.15;
+  z-index: 0;
+}
+.paso {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 0 1.5rem;
+}
+.paso-num {
+  width: 48px; height: 48px;
+  background: var(--negro);
+  color: var(--amarillo);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  display: flex; align-items: center; justify-content: center;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  margin-bottom: 1.5rem;
+}
+.paso-icono {
+  font-size: 2.5rem; margin-bottom: 1rem; display: block;
+}
+.paso h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem; font-weight: 900;
+  color: var(--negro); letter-spacing: 0.05em;
+  text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.paso p { font-size: 0.88rem; color: rgba(0,0,0,0.6); line-height: 1.6; }
+
+/* ─── EL PRODUCTO ─── */
+#producto {
+  background: var(--negro);
+  padding: 5rem 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+.s-label {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--azul);
+  margin-bottom: 0.75rem;
+}
+h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 0.95; letter-spacing: 0.02em;
+  color: var(--blanco); margin-bottom: 1.5rem;
+}
+h2 em { color: var(--amarillo); font-style: normal; }
+.producto-texto p {
+  font-size: 0.95rem; color: rgba(255,255,255,0.6);
+  line-height: 1.75; margin-bottom: 1rem;
+}
+.producto-features {
+  list-style: none; margin-top: 2rem;
+  display: flex; flex-direction: column; gap: 0.75rem;
+}
+.producto-features li {
+  display: flex; gap: 1rem; align-items: flex-start;
+  font-size: 0.9rem; color: rgba(255,255,255,0.8);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.producto-features li::before {
+  content: '✦';
+  color: var(--amarillo); font-size: 0.7rem;
+  margin-top: 3px; flex-shrink: 0;
+}
+.producto-fotos {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+.foto-slot {
+  background: var(--gris-medio);
+  border: 1px solid rgba(255,192,0,0.15);
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.15);
+  font-size: 0.75rem; letter-spacing: 0.1em;
+  text-transform: uppercase; overflow: hidden;
+}
+.foto-slot img { width: 100%; height: 100%; object-fit: cover; }
+.foto-slot.tall { grid-row: span 2; aspect-ratio: auto; }
+
+/* ─── SEÑA / PRECIO ─── */
+#sena {
+  background: var(--azul);
+  padding: 5rem 3rem;
+}
+#sena .s-label { color: var(--amarillo); }
+#sena h2 { color: var(--blanco); }
+.sena-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.sena-card {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 2rem;
+}
+.sena-card h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5); margin-bottom: 0.75rem;
+}
+.sena-monto {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.5rem; color: var(--amarillo);
+  line-height: 1; display: block; margin-bottom: 0.3rem;
+}
+.sena-monto span { font-size: 1.5rem; }
+.sena-card p { font-size: 0.85rem; color: rgba(255,255,255,0.65); line-height: 1.6; margin-top: 0.75rem; }
+.sena-nota {
+  margin-top: 2.5rem;
+  background: rgba(255,192,0,0.1);
+  border-left: 4px solid var(--amarillo);
+  padding: 1.2rem 1.5rem;
+  font-size: 0.87rem; color: rgba(255,255,255,0.8); line-height: 1.65;
+}
+.sena-nota strong { color: var(--amarillo); }
+
+/* ─── ZONAS ─── */
+#zonas {
+  background: var(--negro);
+  padding: 5rem 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: start;
+}
+.zonas-lista {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+.zona-item {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 0.88rem; color: rgba(255,255,255,0.7);
+}
+.zona-item::before {
+  content: '';
+  width: 8px; height: 8px;
+  background: var(--amarillo);
+  flex-shrink: 0;
+  clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+}
+.zona-pronto { color: rgba(255,255,255,0.3) !important; }
+.zona-pronto::before { background: rgba(255,255,255,0.15) !important; }
+.zona-badge-pronto {
+  margin-left: auto;
+  font-size: 0.6rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.1rem 0.4rem;
+}
+.mapa-placeholder {
+  background: var(--gris-medio);
+  border: 1px solid rgba(255,192,0,0.15);
+  height: 400px;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 1rem;
+  color: rgba(255,255,255,0.2);
+}
+.mapa-placeholder span { font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.horarios {
+  margin-top: 2.5rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 2rem;
+}
+.horario-row {
+  display: flex; justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.88rem;
+}
+.horario-row strong { color: var(--blanco); }
+.horario-row span { color: rgba(255,255,255,0.45); }
+.horario-row.cerrado span { color: rgba(255,255,255,0.2); }
+
+/* ─── FAQ ─── */
+#faq {
+  background: var(--gris);
+  padding: 5rem 3rem;
+  max-width: 860px;
+  margin: 0 auto;
+  /* hack para full width con max-content */
+  width: 100%;
+  box-sizing: content-box;
+  padding-left: max(3rem, calc((100vw - 860px)/2));
+  padding-right: max(3rem, calc((100vw - 860px)/2));
+}
+#faq .s-label { color: var(--azul); }
+#faq h2 { margin-bottom: 3rem; }
+.faq-item {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.faq-q {
+  width: 100%; background: none; border: none; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.3rem 0;
+  font-family: 'Barlow', sans-serif; font-size: 1rem; font-weight: 500;
+  color: var(--blanco); text-align: left; gap: 1rem;
+  transition: color 0.2s;
+}
+.faq-q:hover { color: var(--amarillo); }
+.faq-icon {
+  width: 28px; height: 28px; flex-shrink: 0;
+  background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; transition: transform 0.3s, background 0.2s;
+  color: var(--amarillo);
+}
+.faq-item.open .faq-icon { transform: rotate(45deg); background: var(--amarillo); color: var(--negro); }
+.faq-a {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+.faq-a p {
+  padding: 0 0 1.5rem;
+  font-size: 0.9rem; color: rgba(255,255,255,0.55); line-height: 1.75;
+}
+.faq-item.open .faq-a { max-height: 300px; }
+
+/* ─── CTA FINAL ─── */
+#cta-final {
+  background: var(--amarillo);
+  padding: 6rem 3rem;
+  text-align: center;
+}
+#cta-final h2 {
+  color: var(--negro); font-size: clamp(3rem, 6vw, 5.5rem);
+  margin-bottom: 1rem;
+}
+#cta-final p {
+  color: rgba(0,0,0,0.6); font-size: 1.05rem;
+  max-width: 480px; margin: 0 auto 2.5rem;
+  line-height: 1.65;
+}
+.btn-dark {
+  background: var(--negro); color: var(--amarillo);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem; font-weight: 900;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 1rem 2.8rem; text-decoration: none;
+  display: inline-block;
+  clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  transition: background 0.15s;
+}
+.btn-dark:hover { background: var(--azul); color: var(--blanco); }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--negro);
+  border-top: 2px solid var(--amarillo);
+  padding: 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+.footer-brand { }
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; letter-spacing: 0.05em;
+  color: var(--amarillo);
+  display: block; margin-bottom: 0.5rem;
+}
+.footer-brand p {
+  font-size: 0.82rem; color: rgba(255,255,255,0.35); line-height: 1.6;
+}
+.footer-col h4 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35); margin-bottom: 1rem;
+}
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+.footer-col ul a {
+  color: rgba(255,255,255,0.5); text-decoration: none;
+  font-size: 0.88rem; transition: color 0.2s;
+}
+.footer-col ul a:hover { color: var(--amarillo); }
+footer small {
+  grid-column: 1/-1; text-align: center;
+  font-size: 0.75rem; color: rgba(255,255,255,0.2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 1.5rem; margin-top: 1rem;
+}
+
+/* ─── ECO SECTION ─── */
+#eco {
+  background: var(--negro);
+  padding: 5rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+#eco::before {
+  content: 'ECO';
+  position: absolute;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28vw;
+  color: rgba(0,255,0,0.03);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+}
+.eco-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: end;
+  margin-bottom: 4rem;
+}
+.eco-header .s-label { color: #00cc44; }
+.eco-header h2 { color: var(--blanco); }
+.eco-header h2 em { color: #00cc44; font-style: normal; }
+.eco-header p {
+  font-size: 1rem; color: rgba(255,255,255,0.55);
+  line-height: 1.75;
+  border-left: 3px solid #00cc44;
+  padding-left: 1.5rem;
+}
+.eco-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.eco-stat {
+  background: var(--negro);
+  padding: 2.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.eco-stat:hover { background: var(--gris-medio); }
+.eco-stat::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: #00cc44;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.eco-stat:hover::after { transform: scaleX(1); }
+.eco-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.8rem; line-height: 1;
+  color: #00cc44;
+  display: block; margin-bottom: 0.5rem;
+}
+.eco-num span { font-size: 2rem; }
+.eco-stat h4 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--blanco); margin-bottom: 0.5rem;
+}
+.eco-stat p { font-size: 0.82rem; color: rgba(255,255,255,0.4); line-height: 1.55; }
+.eco-pilares {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+.eco-pilar {
+  background: var(--gris-medio);
+  border: 1px solid rgba(0,204,68,0.15);
+  padding: 2rem;
+  transition: border-color 0.2s;
+}
+.eco-pilar:hover { border-color: rgba(0,204,68,0.5); }
+.eco-pilar-icon {
+  font-size: 2rem; display: block; margin-bottom: 1rem;
+}
+.eco-pilar h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem; font-weight: 900;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #00cc44; margin-bottom: 0.6rem;
+}
+.eco-pilar p { font-size: 0.85rem; color: rgba(255,255,255,0.5); line-height: 1.65; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .eco-header { grid-template-columns: 1fr; gap: 2rem; }
+  .eco-stats { grid-template-columns: 1fr 1fr; }
+  .eco-pilares { grid-template-columns: 1fr; }
+  nav { padding: 0 1.5rem; }
+  nav ul { display: none; }
+  #hero { grid-template-columns: 1fr; padding: 5rem 1.5rem 3rem; }
+  .hero-right { display: none; }
+  #producto, #zonas { grid-template-columns: 1fr; gap: 3rem; }
+  .pasos { grid-template-columns: 1fr 1fr; }
+  .pasos::before { display: none; }
+  .sena-grid { grid-template-columns: 1fr; }
+  footer { grid-template-columns: 1fr; }
+  footer small { grid-column: 1; }
+  section { padding: 3.5rem 1.5rem; }
+  #faq { padding: 3.5rem 1.5rem; box-sizing: border-box; }
+}
+
+/* ─── ANIMACIONES DE ENTRADA ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- NAV                                        -->
+<!-- ══════════════════════════════════════════ -->
+<nav>
+  <a href="#" class="nav-logo">La <span>Sodería</span> ATR</a>
+  <ul>
+    <li><a href="#como-funciona">Cómo funciona</a></li>
+    <li><a href="#producto">El sifón</a></li>
+    <li><a href="#eco">Impacto</a></li>
+    <li><a href="#sena">Precios</a></li>
+    <li><a href="#zonas">Zonas</a></li>
+    <li><a href="registro.html" class="nav-cta">Quiero ser cliente</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- HERO                                       -->
+<!-- ══════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-lines"></div>
+
+  <div class="hero-left reveal">
+    <div class="hero-tag">Ahora disponible en Lima</div>
+    <h1>
+      SODA<br>
+      <span class="amarillo">EN SIFÓN</span><br>
+      <span class="azul">A TU</span><br>
+      PUERTA
+    </h1>
+    <p class="hero-sub">
+      Soda carbonatada en sifones 100% retornables y reciclables, entregada en tu casa u oficina.
+      Casi cero desechos. Cero plástico descartable. Bueno para vos, bueno para Lima.
+    </p>
+    <div class="hero-btns">
+      <a href="registro.html" class="btn-primary">Quiero ser cliente →</a>
+      <a href="#como-funciona" class="btn-secondary">Cómo funciona</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <span class="stat-n">48hs</span>
+        <span class="stat-l">Primera entrega</span>
+      </div>
+      <div>
+        <span class="stat-n">12</span>
+        <span class="stat-l">Distritos</span>
+      </div>
+      <div>
+        <span class="stat-n">0</span>
+        <span class="stat-l">Plástico descartable</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right reveal" style="animation-delay:0.15s">
+    <div class="hero-img-wrap">
+      <!-- REEMPLAZAR con: <img src="fotos/hero.jpg" alt="Sifones La Sodería"> -->
+      <div class="hero-img-placeholder">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="24" y="8" width="16" height="18" rx="3" fill="currentColor"/>
+          <rect x="28" y="26" width="8" height="5" fill="currentColor"/>
+          <path d="M20 31 L44 31 L46 54 C46 56 44 58 42 58 L22 58 C20 58 18 56 18 54 Z" fill="currentColor"/>
+          <path d="M22 8 L18 8 C14 8 12 12 12 16 L12 20 C12 22 14 24 16 24 L24 24" stroke="currentColor" stroke-width="2" fill="none"/>
+        </svg>
+        <span>Foto del sifón</span>
+      </div>
+      <div class="hero-badge">
+        <strong>S/ 50</strong>
+        <span>Seña por cajón</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- COMO FUNCIONA                              -->
+<!-- ══════════════════════════════════════════ -->
+<section id="como-funciona">
+  <p class="s-label">El proceso</p>
+  <h2>ASÍ DE<br>SIMPLE</h2>
+  <div class="pasos">
+    <div class="paso reveal">
+      <div class="paso-num">01</div>
+      <span class="paso-icono">📝</span>
+      <h3>Te registrás</h3>
+      <p>Completás tus datos, verificamos tu identidad y aceptás los términos. Todo online en 5 minutos.</p>
+    </div>
+    <div class="paso reveal" style="transition-delay:0.1s">
+      <div class="paso-num">02</div>
+      <span class="paso-icono">💳</span>
+      <h3>Pagás la seña</h3>
+      <p>S/ 50 por cajón. Transferencia o Yape. La seña es tuya — te la devolvemos cuando devolvés los sifones.</p>
+    </div>
+    <div class="paso reveal" style="transition-delay:0.2s">
+      <div class="paso-num">03</div>
+      <span class="paso-icono">📦</span>
+      <h3>Recibís tu cajón</h3>
+      <p>En 48 horas te llevamos el cajón con los sifones cargados a la dirección que elegiste.</p>
+    </div>
+    <div class="paso reveal" style="transition-delay:0.3s">
+      <div class="paso-num">04</div>
+      <span class="paso-icono">💬</span>
+      <h3>Pedís por WhatsApp</h3>
+      <p>Cuando necesitás recarga, nos escribís. Te identificamos, elegís día y horario, y listo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- EL PRODUCTO                                -->
+<!-- ══════════════════════════════════════════ -->
+<section id="producto">
+  <div class="producto-texto reveal">
+    <p class="s-label">El producto</p>
+    <h2>EL <em>SIFÓN</em><br>DE SIEMPRE</h2>
+    <p>
+      El sifón de soda es el dispensador de agua carbonatada más clásico. Carga perfecta, sin pérdida de gas, sin plástico. El de toda la vida, mejorado.
+    </p>
+    <p>
+      Nuestros sifones son retornables. Vos los usás, nosotros los recuperamos, los limpiamos y los recargamos. Un ciclo limpio y sin residuos.
+    </p>
+    <ul class="producto-features">
+      <li>Sifón de 650ml con cabezal dispensador propio</li>
+      <li>Cajón estándar de 6 sifones, con tu logo visible en el cajón</li>
+      <li>Gas carbónico de calidad alimentaria</li>
+      <li>Recogida y recarga por nuestro repartidor de zona</li>
+      <li>Sin contrato fijo — cancelás con 7 días de anticipación</li>
+    </ul>
+  </div>
+  <div class="producto-fotos reveal" style="transition-delay:0.15s">
+    <!-- REEMPLAZAR con imágenes reales -->
+    <div class="foto-slot tall">
+      <img src="fotos/cajones.jpg" alt="Cajones La Sodería" onerror="this.style.display='none'">
+      <span>Foto cajones</span>
+    </div>
+    <div class="foto-slot">
+      <img src="fotos/sifon-detalle.jpg" alt="Sifón detalle" onerror="this.style.display='none'">
+      <span>Sifón</span>
+    </div>
+    <div class="foto-slot">
+      <img src="fotos/entrega.jpg" alt="Entrega" onerror="this.style.display='none'">
+      <span>Entrega</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- ECO / MEDIOAMBIENTE                        -->
+<!-- ══════════════════════════════════════════ -->
+<section id="eco">
+  <div class="eco-header reveal">
+    <div>
+      <p class="s-label">Impacto ambiental</p>
+      <h2>BUENO PARA<br>VOS. <em>MEJOR</em><br>PARA LIMA.</h2>
+    </div>
+    <p>
+      Cada sifón que usás reemplaza decenas de botellas de plástico descartable.
+      Nuestro sistema de retorno y recarga cierra el ciclo: recogemos los sifones vacíos,
+      los lavamos, los recargamos y los volvemos a poner en circulación.
+      El resultado es casi cero residuos por cada litro de soda consumida.
+    </p>
+  </div>
+
+  <div class="eco-stats">
+    <div class="eco-stat reveal">
+      <span class="eco-num">0<span>%</span></span>
+      <h4>Plástico descartable</h4>
+      <p>Ninguna botella PET ni lata de un solo uso en todo el proceso.</p>
+    </div>
+    <div class="eco-stat reveal" style="transition-delay:0.08s">
+      <span class="eco-num">+50<span>x</span></span>
+      <h4>Usos por sifón</h4>
+      <p>Cada sifón se reutiliza decenas de veces antes de ser reciclado.</p>
+    </div>
+    <div class="eco-stat reveal" style="transition-delay:0.16s">
+      <span class="eco-num">~0</span>
+      <h4>Residuos generados</h4>
+      <p>El único residuo posible es el agua de lavado. Sin más.</p>
+    </div>
+    <div class="eco-stat reveal" style="transition-delay:0.24s">
+      <span class="eco-num">100<span>%</span></span>
+      <h4>Retornable</h4>
+      <p>Todo vuelve: sifones, cajones, cabezales. Nada termina en la basura.</p>
+    </div>
+  </div>
+
+  <div class="eco-pilares">
+    <div class="eco-pilar reveal">
+      <span class="eco-pilar-icon">♻️</span>
+      <h3>Retornable</h3>
+      <p>Los sifones y cajones vuelven a nosotros después de cada uso. Los lavamos con procesos seguros y los volvemos a cargar. El equipo nunca termina en la basura.</p>
+    </div>
+    <div class="eco-pilar reveal" style="transition-delay:0.1s">
+      <span class="eco-pilar-icon">💧</span>
+      <h3>Sin plástico de un solo uso</h3>
+      <p>Una botella PET tarda hasta 400 años en degradarse. Nuestros sifones de vidrio y plástico duro se reutilizan indefinidamente, cortando ese ciclo de raíz.</p>
+    </div>
+    <div class="eco-pilar reveal" style="transition-delay:0.2s">
+      <span class="eco-pilar-icon">🌿</span>
+      <h3>Circuito cerrado</h3>
+      <p>Retiro de vacíos → lavado → recarga → entrega. Un loop limpio que no genera residuos intermedios. Menos camiones, menos embalaje, menos impacto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÑA / PRECIO                              -->
+<!-- ══════════════════════════════════════════ -->
+<section id="sena">
+  <p class="s-label">Precios y seña</p>
+  <h2>TRANSPARENTE<br>DESDE EL <em>DÍA UNO</em></h2>
+  <div class="sena-grid">
+    <div class="sena-card reveal">
+      <h3>Seña por sifón</h3>
+      <span class="sena-monto">S/ <span>5</span></span>
+      <p>Depósito por cada sifón en tu poder. Se devuelve cuando retornás el equipo.</p>
+    </div>
+    <div class="sena-card reveal" style="transition-delay:0.1s">
+      <h3>Seña por cajón</h3>
+      <span class="sena-monto">S/ <span>50</span></span>
+      <p>6 sifones × S/5 + S/20 por el cajón. Un solo pago al activar tu cuenta.</p>
+    </div>
+    <div class="sena-card reveal" style="transition-delay:0.2s">
+      <h3>Recarga de soda</h3>
+      <span class="sena-monto">S/ <span>?</span></span>
+      <p>El precio de cada recarga te lo confirma tu repartidor. El cobro es en efectivo al momento de la entrega.</p>
+    </div>
+  </div>
+  <div class="sena-nota reveal">
+    <strong>Importante:</strong> La seña no cubre el costo total del equipo. Si no devolvés el cajón, se aplica el costo de reposición según los términos aceptados al registrarte. Si no realizás ningún pedido en 45 días, te contactamos para coordinar la devolución y te reintegramos la seña completa.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- ZONAS                                      -->
+<!-- ══════════════════════════════════════════ -->
+<section id="zonas">
+  <div class="reveal">
+    <p class="s-label">Cobertura</p>
+    <h2>¿LLEGAMOS<br>A TU <em>ZONA?</em></h2>
+    <div class="zonas-lista">
+      <div class="zona-item">Miraflores</div>
+      <div class="zona-item">San Isidro</div>
+      <div class="zona-item">Barranco</div>
+      <div class="zona-item">Surco</div>
+      <div class="zona-item">La Molina</div>
+      <div class="zona-item">San Borja</div>
+      <div class="zona-item">Jesús María</div>
+      <div class="zona-item">Lince</div>
+      <div class="zona-item">Pueblo Libre</div>
+      <div class="zona-item">Magdalena</div>
+      <div class="zona-item">San Miguel</div>
+      <div class="zona-item">Chorrillos</div>
+      <div class="zona-item zona-pronto">Surquillo <span class="zona-badge-pronto">Pronto</span></div>
+      <div class="zona-item zona-pronto">Breña <span class="zona-badge-pronto">Pronto</span></div>
+    </div>
+    <div class="horarios">
+      <div class="horario-row"><strong>Lunes a Viernes</strong><span>9:00 am – 6:00 pm</span></div>
+      <div class="horario-row"><strong>Sábados</strong><span>9:00 am – 2:00 pm</span></div>
+      <div class="horario-row cerrado"><strong>Domingos y feriados</strong><span>Sin servicio</span></div>
+    </div>
+  </div>
+  <div class="mapa-placeholder reveal" style="transition-delay:0.15s">
+    <!-- REEMPLAZAR con Google Maps embed -->
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+      <circle cx="12" cy="9" r="2.5"/>
+    </svg>
+    <span>Mapa de cobertura</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- FAQ                                        -->
+<!-- ══════════════════════════════════════════ -->
+<section id="faq" style="background:var(--gris);padding:5rem 3rem;width:100%;box-sizing:border-box;">
+  <p class="s-label" style="color:var(--azul)">Preguntas frecuentes</p>
+  <h2 style="margin-bottom:3rem">LO QUE MÁS<br>NOS <em>PREGUNTAN</em></h2>
+
+  <div class="faq-item">
+    <button class="faq-q">¿Qué pasa si quiero dejar el servicio?<span class="faq-icon">+</span></button>
+    <div class="faq-a"><p>Podés cancelar en cualquier momento con 7 días de anticipación. Coordinamos la recogida de los sifones y cajones, y te devolvemos la seña completa.</p></div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q">¿Con qué frecuencia puedo pedir recarga?<span class="faq-icon">+</span></button>
+    <div class="faq-a"><p>Cuando quieras. No hay mínimos ni frecuencia obligatoria. Simplemente nos escribís por WhatsApp desde tu número registrado y coordinamos la entrega.</p></div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q">¿Puedo tener más de un cajón?<span class="faq-icon">+</span></button>
+    <div class="faq-a"><p>Sí. Podés tener hasta 2 cajones sin necesidad de autorización especial. Para más de 2, nos contactás y lo coordinamos.</p></div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q">¿Qué pasa si un sifón se rompe?<span class="faq-icon">+</span></button>
+    <div class="faq-a"><p>Nos avisás por WhatsApp. Evaluamos el caso. Si fue por uso normal, lo reponemos sin cargo. Si fue por mal uso o accidente, se cobra el costo de reposición según los términos aceptados.</p></div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q">¿Cómo verifican mi identidad?<span class="faq-icon">+</span></button>
+    <div class="faq-a"><p>Durante el registro hacemos una verificación de DNI automática. Es un proceso rápido, 100% online, y tus datos están protegidos según la Ley de Protección de Datos Personales. No los usamos con fines de marketing.</p></div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q">¿Qué pasa si paso 45 días sin pedir recarga?<span class="faq-icon">+</span></button>
+    <div class="faq-a"><p>Te contactamos para saber cómo estás y coordinar la devolución de los equipos. Al devolver todo en buen estado, te reintegramos la seña completa sin demoras.</p></div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q">¿Cómo le pago al repartidor?<span class="faq-icon">+</span></button>
+    <div class="faq-a"><p>El repartidor cobra en efectivo al momento de la entrega. Estamos trabajando para sumar más opciones de pago próximamente.</p></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- CTA FINAL                                  -->
+<!-- ══════════════════════════════════════════ -->
+<section id="cta-final">
+  <h2 class="reveal">¿LISTO PARA<br>EL PRIMER CAJÓN?</h2>
+  <p class="reveal">El registro toma 5 minutos. La primera entrega, 48 horas. El resto, solo pedís por WhatsApp.</p>
+  <a href="registro.html" class="btn-dark reveal">Registrarme ahora →</a>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- FOOTER                                     -->
+<!-- ══════════════════════════════════════════ -->
+<footer>
+  <div class="footer-brand">
+    <span class="footer-logo">La Sodería ATR</span>
+    <p>Soda en sifones retornables<br>a domicilio en Lima.</p>
+  </div>
+  <div class="footer-col">
+    <h4>Navegación</h4>
+    <ul>
+      <li><a href="#como-funciona">Cómo funciona</a></li>
+      <li><a href="#producto">El sifón</a></li>
+      <li><a href="#sena">Precios</a></li>
+      <li><a href="#zonas">Zonas</a></li>
+      <li><a href="registro.html">Registrarme</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Contacto</h4>
+    <ul>
+      <li><a href="https://wa.me/51999000000">WhatsApp</a></li>
+      <li><a href="mailto:hola@lasoderia.pe">hola@lasoderia.pe</a></li>
+      <li><a href="terminos.html">Términos y condiciones</a></li>
+      <li><a href="privacidad.html">Política de privacidad</a></li>
+    </ul>
+  </div>
+  <small>© 2025 La Sodería ATR · lasoderia.pe · Lima, Perú</small>
+</footer>
+
+<script>
+// ── Reveal on scroll ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── FAQ accordion ──
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
