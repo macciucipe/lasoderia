@@ -362,14 +362,21 @@ textarea { resize: vertical; min-height: 90px; }
     </div>
     <div class="form-group">
       <label>Dirección principal *</label>
-      <input type="text" id="direccion1" placeholder="Av. Principal 123, Dpto. 4B">
+      <input type="text" id="direccion1" placeholder="Escribí tu dirección…" autocomplete="off">
       <div class="field-error" id="err-direccion1">Ingresá tu dirección</div>
     </div>
-    <div class="form-group" id="grupo-dir2" style="display:none">
+    <div id="mapa1" style="width:100%;height:220px;margin-top:0.75rem;border:1.5px solid rgba(255,192,0,0.2);display:none;"></div>
+    <input type="hidden" id="lat1">
+    <input type="hidden" id="lng1">
+
+    <div class="form-group" id="grupo-dir2" style="display:none;margin-top:1.5rem">
       <label>Segunda dirección (opcional)</label>
-      <input type="text" id="direccion2" placeholder="Otra dirección de entrega">
+      <input type="text" id="direccion2" placeholder="Escribí otra dirección…" autocomplete="off">
+      <div id="mapa2" style="width:100%;height:220px;margin-top:0.75rem;border:1.5px solid rgba(255,192,0,0.2);display:none;"></div>
+      <input type="hidden" id="lat2">
+      <input type="hidden" id="lng2">
     </div>
-    <button class="add-dir-btn" onclick="toggleDir2()" id="btn-add-dir">
+    <button class="add-dir-btn" onclick="toggleDir2()" id="btn-add-dir" style="margin-top:1rem">
       + Agregar segunda dirección de entrega
     </button>
     <div class="btn-row">
@@ -628,6 +635,8 @@ async function enviarRegistro() {
     direccion_1: document.getElementById('direccion1').value.trim(),
     direccion_2: document.getElementById('direccion2').value.trim() || null,
     distrito: document.getElementById('distrito').value,
+    latitud: parseFloat(document.getElementById('lat1').value) || null,
+    longitud: parseFloat(document.getElementById('lng1').value) || null,
     cajones_asignados: parseInt(document.getElementById('cajones').value),
     estado: 'pendiente',
     sena_pagada: false,
@@ -657,5 +666,80 @@ async function enviarRegistro() {
   }
 }
 </script>
+<!-- Google Maps -->
+<script>
+let map1, map2, marker1, marker2, autocomplete1, autocomplete2;
+
+function initMaps() {
+  const limaCenter = { lat: -12.0464, lng: -77.0428 };
+  const mapOpts = {
+    zoom: 15,
+    center: limaCenter,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+    styles: [
+      { elementType: 'geometry', stylers: [{ color: '#1e1e1e' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#ffc000' }] },
+      { elementType: 'labels.text.stroke', stylers: [{ color: '#000000' }] },
+      { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#333333' }] },
+      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0000aa' }] },
+      { featureType: 'poi', stylers: [{ visibility: 'off' }] }
+    ]
+  };
+
+  // Mapa 1
+  map1 = new google.maps.Map(document.getElementById('mapa1'), mapOpts);
+  marker1 = new google.maps.Marker({ map: map1, draggable: true });
+  marker1.addListener('dragend', e => {
+    document.getElementById('lat1').value = e.latLng.lat();
+    document.getElementById('lng1').value = e.latLng.lng();
+  });
+
+  // Autocomplete 1
+  autocomplete1 = new google.maps.places.Autocomplete(
+    document.getElementById('direccion1'),
+    { componentRestrictions: { country: 'pe' }, fields: ['geometry', 'formatted_address'] }
+  );
+  autocomplete1.addListener('place_changed', () => {
+    const place = autocomplete1.getPlace();
+    if (!place.geometry) return;
+    const loc = place.geometry.location;
+    document.getElementById('mapa1').style.display = 'block';
+    document.getElementById('lat1').value = loc.lat();
+    document.getElementById('lng1').value = loc.lng();
+    map1.setCenter(loc);
+    marker1.setPosition(loc);
+    marker1.setVisible(true);
+    document.getElementById('direccion1').classList.add('ok');
+  });
+
+  // Mapa 2
+  map2 = new google.maps.Map(document.getElementById('mapa2'), mapOpts);
+  marker2 = new google.maps.Marker({ map: map2, draggable: true });
+  marker2.addListener('dragend', e => {
+    document.getElementById('lat2').value = e.latLng.lat();
+    document.getElementById('lng2').value = e.latLng.lng();
+  });
+
+  // Autocomplete 2
+  autocomplete2 = new google.maps.places.Autocomplete(
+    document.getElementById('direccion2'),
+    { componentRestrictions: { country: 'pe' }, fields: ['geometry', 'formatted_address'] }
+  );
+  autocomplete2.addListener('place_changed', () => {
+    const place = autocomplete2.getPlace();
+    if (!place.geometry) return;
+    const loc = place.geometry.location;
+    document.getElementById('mapa2').style.display = 'block';
+    document.getElementById('lat2').value = loc.lat();
+    document.getElementById('lng2').value = loc.lng();
+    map2.setCenter(loc);
+    marker2.setPosition(loc);
+    marker2.setVisible(true);
+  });
+}
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD66G-YiES-EmpwZuyg5ObiDlN8amBAnlM&libraries=places&callback=initMaps" async defer></script>
 </body>
 </html>
