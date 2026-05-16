@@ -364,26 +364,11 @@ async function buscarCliente() {
   $('spin-buscar').classList.add('on');
   clienteActual = null;
 
-  // Buscar por DNI (contiene el número ingresado)
-  const { data: porDni } = await sb
-    .from('clientes')
-    .select('*')
-    .ilike('dni', `%${q}%`)
-    .limit(1);
-
-  // Buscar por teléfono — probamos con y sin +51
-  const qTel = q.replace(/\s+/g,'');
-  const { data: porTel } = await sb
-    .from('clientes')
-    .select('*')
-    .or(`telefono.ilike.%${qTel}%`)
-    .limit(1);
+  const { data, error } = await sb.rpc('buscar_cliente', { q: q });
 
   $('spin-buscar').classList.remove('on');
 
-  const cliente = (porDni && porDni.length > 0)
-    ? porDni[0]
-    : (porTel && porTel.length > 0 ? porTel[0] : null);
+  const cliente = data && data.length > 0 ? data[0] : null;
 
   if (cliente) {
     clienteActual = cliente;
