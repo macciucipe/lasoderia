@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Admin — La Sodería ATR</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --negro: #000; --amarillo: #ffc000; --azul: #0000ff;
+  --blanco: #fff; --gris: #111; --gris-medio: #1a1a1a;
+  --verde: #00cc44; --rojo: #ff3333; --naranja: #ff8800;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--negro);color:var(--blanco);font-family:'Barlow',sans-serif;min-height:100vh;display:flex;}
+
+/* ─── SIDEBAR ─── */
+#sidebar{width:220px;min-height:100vh;background:var(--gris);border-right:1px solid rgba(255,192,0,0.15);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform 0.3s;}
+.sb-logo{padding:1.5rem;border-bottom:1px solid rgba(255,255,255,0.06);}
+.sb-logo h1{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--amarillo);letter-spacing:0.05em;line-height:1;}
+.sb-logo span{color:var(--azul);}
+.sb-logo p{font-size:0.65rem;color:rgba(255,255,255,0.25);letter-spacing:0.15em;text-transform:uppercase;margin-top:0.2rem;}
+.sb-nav{flex:1;padding:1rem 0;}
+.sb-section{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:1rem 1.5rem 0.4rem;}
+.sb-item{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1.5rem;color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.15s;font-size:0.88rem;border-left:3px solid transparent;}
+.sb-item:hover{color:var(--blanco);background:rgba(255,255,255,0.04);}
+.sb-item.active{color:var(--amarillo);background:rgba(255,192,0,0.06);border-left-color:var(--amarillo);}
+.sb-item .ico{font-size:1rem;width:20px;text-align:center;}
+.sb-badge{margin-left:auto;background:var(--rojo);color:var(--blanco);font-size:0.65rem;font-weight:700;padding:0.1rem 0.45rem;border-radius:99px;}
+.sb-footer{padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,0.06);}
+.sb-footer p{font-size:0.75rem;color:rgba(255,255,255,0.25);}
+#btn-logout-admin{background:none;border:none;color:rgba(255,255,255,0.3);font-size:0.75rem;cursor:pointer;font-family:'Barlow',sans-serif;margin-top:0.3rem;padding:0;}
+#btn-logout-admin:hover{color:var(--rojo);}
+
+/* ─── MAIN ─── */
+#main{margin-left:220px;flex:1;min-height:100vh;}
+.topbar{height:56px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:var(--negro);}
+.topbar h2{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--blanco);letter-spacing:0.05em;}
+.topbar-right{display:flex;align-items:center;gap:1rem;}
+.fecha-hoy{font-size:0.78rem;color:rgba(255,255,255,0.3);}
+.content{padding:2rem;}
+
+/* ─── LOGIN SCREEN ─── */
+#screen-login{display:flex;align-items:center;justify-content:center;min-height:100vh;width:100%;}
+.login-box{width:360px;padding:2.5rem;}
+.login-box h1{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--blanco);margin-bottom:0.3rem;}
+.login-box h1 em{color:var(--amarillo);font-style:normal;}
+.login-box p{font-size:0.85rem;color:rgba(255,255,255,0.35);margin-bottom:2rem;}
+
+/* ─── SCREENS ─── */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ─── STATS GRID ─── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+.stat-box{background:var(--gris-medio);border:1px solid rgba(255,255,255,0.06);padding:1.25rem;}
+.stat-box .s-label{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:0.5rem;}
+.stat-box .s-val{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--amarillo);line-height:1;}
+.stat-box .s-sub{font-size:0.75rem;color:rgba(255,255,255,0.3);margin-top:0.2rem;}
+.stat-box.alert .s-val{color:var(--rojo);}
+.stat-box.ok .s-val{color:var(--verde);}
+
+/* ─── TABLES ─── */
+.table-wrap{background:var(--gris-medio);border:1px solid rgba(255,255,255,0.06);overflow:hidden;}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.06);}
+.table-header h3{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--blanco);}
+.table-filters{display:flex;gap:0.5rem;}
+.filter-btn{background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);padding:0.3rem 0.8rem;font-size:0.75rem;cursor:pointer;font-family:'Barlow',sans-serif;transition:all 0.15s;}
+.filter-btn.active,.filter-btn:hover{border-color:var(--amarillo);color:var(--amarillo);}
+table{width:100%;border-collapse:collapse;}
+th{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:0.75rem 1.5rem;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06);}
+td{padding:0.85rem 1.5rem;font-size:0.85rem;border-bottom:1px solid rgba(255,255,255,0.04);color:rgba(255,255,255,0.8);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+tr:last-child td{border-bottom:none;}
+
+/* ─── BADGES ─── */
+.badge{display:inline-block;padding:0.2rem 0.65rem;font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;}
+.badge.activo{background:rgba(0,204,68,0.15);color:var(--verde);}
+.badge.pendiente{background:rgba(255,192,0,0.15);color:var(--amarillo);}
+.badge.inactivo,.badge.suspendido{background:rgba(255,51,51,0.15);color:var(--rojo);}
+.badge.entregado{background:rgba(0,204,68,0.15);color:var(--verde);}
+.badge.confirmado{background:rgba(255,192,0,0.15);color:var(--amarillo);}
+.badge.directa{background:rgba(0,0,255,0.15);color:#6688ff;}
+
+/* ─── ACTION BUTTONS ─── */
+.action-btn{background:none;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);padding:0.25rem 0.65rem;font-size:0.72rem;cursor:pointer;font-family:'Barlow',sans-serif;transition:all 0.15s;white-space:nowrap;}
+.action-btn:hover{border-color:var(--amarillo);color:var(--amarillo);}
+.action-btn.aprobar{border-color:rgba(0,204,68,0.3);color:var(--verde);}
+.action-btn.aprobar:hover{background:rgba(0,204,68,0.1);}
+.action-btn.rechazar{border-color:rgba(255,51,51,0.3);color:var(--rojo);}
+.action-btn.rechazar:hover{background:rgba(255,51,51,0.1);}
+.btn-p{background:var(--amarillo);color:var(--negro);font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;padding:0.75rem 1.5rem;border:none;cursor:pointer;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:background 0.15s;}
+.btn-p:hover{background:var(--blanco);}
+
+/* ─── ALERTS ─── */
+.alert-row{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.04);}
+.alert-row:last-child{border-bottom:none;}
+.alert-dias{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--rojo);min-width:50px;}
+.alert-dias.warning{color:var(--naranja);}
+.alert-info{flex:1;padding:0 1rem;}
+.alert-info strong{display:block;font-size:0.9rem;}
+.alert-info span{font-size:0.78rem;color:rgba(255,255,255,0.35);}
+
+/* ─── MODAL ─── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--gris);border:1px solid rgba(255,192,0,0.2);width:640px;max-width:90vw;max-height:85vh;overflow-y:auto;}
+.modal-header{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;}
+.modal-header h3{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--amarillo);}
+.modal-close{background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.4rem;cursor:pointer;line-height:1;}
+.modal-close:hover{color:var(--blanco);}
+.modal-body{padding:1.5rem;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.info-item label{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:0.2rem;}
+.info-item span{font-size:0.9rem;color:var(--blanco);}
+.docs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin:1rem 0;}
+.doc-img{background:var(--gris-medio);border:1px solid rgba(255,255,255,0.08);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;}
+.doc-img img{width:100%;height:100%;object-fit:cover;}
+.doc-img span{font-size:0.72rem;color:rgba(255,255,255,0.25);text-align:center;padding:0.5rem;}
+.doc-label{font-size:0.68rem;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;margin-top:0.4rem;text-align:center;}
+.modal-actions{display:flex;gap:0.75rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.08);}
+
+/* ─── RENDICION ─── */
+.rendicion-card{background:var(--gris-medio);border:1px solid rgba(255,255,255,0.06);padding:1.5rem;margin-bottom:1rem;}
+.rendicion-card h3{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1rem;}
+.rendicion-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem;}
+.r-stat .r-n{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--amarillo);}
+.r-stat .r-l{font-size:0.68rem;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;}
+
+/* ─── FORM ─── */
+.fg{margin-bottom:1rem;}
+label.lbl{display:block;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.4rem;}
+input,select{width:100%;padding:0.7rem 0.9rem;background:var(--negro);border:1.5px solid rgba(255,255,255,0.1);color:var(--blanco);font-family:'Barlow',sans-serif;font-size:0.9rem;outline:none;transition:border-color 0.2s;appearance:none;}
+input:focus,select:focus{border-color:var(--amarillo);}
+
+/* ─── EMPTY ─── */
+.empty{text-align:center;padding:3rem;color:rgba(255,255,255,0.2);}
+.empty .e-ico{font-size:2.5rem;display:block;margin-bottom:0.75rem;}
+.empty p{font-size:0.85rem;}
+
+/* ─── LOADING ─── */
+.spin-wrap{display:none;justify-content:center;padding:2rem;}
+.spin-wrap.on{display:flex;}
+.spin{width:20px;height:20px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--amarillo);border-radius:50%;animation:rot 0.7s linear infinite;}
+@keyframes rot{to{transform:rotate(360deg);}}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--verde);color:var(--negro);padding:0.85rem 1.5rem;font-weight:700;font-size:0.88rem;transition:opacity 0.3s;z-index:999;}
+.toast.err{background:var(--rojo);color:var(--blanco);}
+.toast.hidden{opacity:0;pointer-events:none;}
+
+@media(max-width:900px){
+  #sidebar{transform:translateX(-220px);}
+  #main{margin-left:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════ -->
+<!-- LOGIN                                  -->
+<!-- ══════════════════════════════════════ -->
+<div id="screen-login">
+  <div class="login-box">
+    <h1>PANEL<br><em>ADMIN</em></h1>
+    <p>La Sodería ATR — Acceso restringido</p>
+    <div class="fg">
+      <label class="lbl">Contraseña</label>
+      <input type="password" id="admin-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginAdmin()">
+    </div>
+    <div style="color:var(--rojo);font-size:0.8rem;margin-bottom:1rem;display:none" id="e-login">Contraseña incorrecta</div>
+    <button class="btn-p" onclick="loginAdmin()" style="width:100%">Ingresar →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SIDEBAR                               -->
+<!-- ══════════════════════════════════════ -->
+<div id="sidebar" style="display:none">
+  <div class="sb-logo">
+    <h1>La <span>Sodería</span> ATR</h1>
+    <p>Panel administración</p>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Principal</div>
+    <div class="sb-item active" onclick="navTo('dashboard')">
+      <span class="ico">📊</span> Dashboard
+    </div>
+    <div class="sb-section">Gestión</div>
+    <div class="sb-item" onclick="navTo('clientes')">
+      <span class="ico">👥</span> Clientes
+      <span class="sb-badge" id="badge-pendientes" style="display:none">0</span>
+    </div>
+    <div class="sb-item" onclick="navTo('pedidos')">
+      <span class="ico">📦</span> Pedidos
+    </div>
+    <div class="sb-item" onclick="navTo('repartidores')">
+      <span class="ico">🚴</span> Repartidores
+    </div>
+    <div class="sb-item" onclick="navTo('alertas')">
+      <span class="ico">⚠️</span> Alertas 45 días
+      <span class="sb-badge" id="badge-alertas" style="display:none">0</span>
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <p id="admin-user">Admin</p>
+    <button id="btn-logout-admin" onclick="logoutAdmin()">Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- MAIN                                  -->
+<!-- ══════════════════════════════════════ -->
+<div id="main" style="display:none">
+  <div class="topbar">
+    <h2 id="page-title">Dashboard</h2>
+    <div class="topbar-right">
+      <span class="fecha-hoy" id="fecha-hoy"></span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="screen-dashboard" class="screen active">
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="s-label">Clientes activos</div>
+          <div class="s-val" id="d-activos">—</div>
+          <div class="s-sub">en el sistema</div>
+        </div>
+        <div class="stat-box alert">
+          <div class="s-label">Pendientes aprobación</div>
+          <div class="s-val" id="d-pendientes">—</div>
+          <div class="s-sub">requieren revisión</div>
+        </div>
+        <div class="stat-box">
+          <div class="s-label">Pedidos hoy</div>
+          <div class="s-val" id="d-pedidos">—</div>
+          <div class="s-sub">registrados</div>
+        </div>
+        <div class="stat-box ok">
+          <div class="s-label">Cobrado esta semana</div>
+          <div class="s-val" id="d-semana">—</div>
+          <div class="s-sub">total repartidores</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <!-- Pendientes de aprobación -->
+        <div class="table-wrap">
+          <div class="table-header">
+            <h3>🔴 Pendientes de aprobación</h3>
+          </div>
+          <div id="dash-pendientes-list"></div>
+        </div>
+
+        <!-- Alertas recientes -->
+        <div class="table-wrap">
+          <div class="table-header">
+            <h3>⚠️ En riesgo de inactividad</h3>
+          </div>
+          <div id="dash-alertas-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div id="screen-clientes" class="screen">
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>Todos los clientes</h3>
+          <div class="table-filters">
+            <button class="filter-btn active" onclick="filtrarClientes('todos',this)">Todos</button>
+            <button class="filter-btn" onclick="filtrarClientes('pendiente',this)">Pendientes</button>
+            <button class="filter-btn" onclick="filtrarClientes('activo',this)">Activos</button>
+            <button class="filter-btn" onclick="filtrarClientes('inactivo',this)">Inactivos</button>
+          </div>
+        </div>
+        <div class="spin-wrap on" id="spin-clientes"><div class="spin"></div></div>
+        <table id="tabla-clientes" style="display:none">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Documento</th>
+              <th>Distrito</th>
+              <th>Cajones</th>
+              <th>Último pedido</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-clientes"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PEDIDOS -->
+    <div id="screen-pedidos" class="screen">
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>Pedidos del día</h3>
+          <div class="table-filters">
+            <button class="filter-btn active" onclick="filtrarPedidos('hoy',this)">Hoy</button>
+            <button class="filter-btn" onclick="filtrarPedidos('semana',this)">Esta semana</button>
+          </div>
+        </div>
+        <div class="spin-wrap on" id="spin-pedidos"><div class="spin"></div></div>
+        <table id="tabla-pedidos" style="display:none">
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Cliente</th>
+              <th>Distrito</th>
+              <th>Tipo</th>
+              <th>Sifones</th>
+              <th>Monto</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-pedidos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPARTIDORES -->
+    <div id="screen-repartidores" class="screen">
+      <div id="rendicion-wrap"></div>
+    </div>
+
+    <!-- ALERTAS -->
+    <div id="screen-alertas" class="screen">
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>Clientes sin pedidos — riesgo de inactividad</h3>
+        </div>
+        <div id="alertas-list"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- MODAL CLIENTE                         -->
+<!-- ══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-nombre">Cliente</h3>
+      <button class="modal-close" onclick="cerrarModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = supabase.createClient(
+  'https://rnyevcqqsjharrncswpl.supabase.co',
+  'sb_publishable_LRKrU-Pjchfp7Y1PqBRxWg_11BekgEF'
+);
+
+const ADMIN_PASS = 'soderia2025'; // Cambiá esto
+let todosClientes = [];
+let todosPedidos = [];
+
+// ── Helpers ──
+function $(id){ return document.getElementById(id); }
+function toast(msg, tipo='ok'){
+  const t=$('toast'); t.textContent=msg;
+  t.className=`toast ${tipo==='err'?'err':''}`;
+  setTimeout(()=>t.classList.add('hidden'),3000);
+}
+function formatFecha(iso){
+  if(!iso) return '—';
+  return new Date(iso).toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'2-digit'});
+}
+function formatHora(iso){
+  if(!iso) return '—';
+  return new Date(iso).toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'});
+}
+function diasDesde(iso){
+  if(!iso) return 999;
+  return Math.floor((Date.now()-new Date(iso))/86400000);
+}
+
+// ── Login ──
+function loginAdmin(){
+  const pass = $('admin-pass').value;
+  if(pass === ADMIN_PASS){
+    $('screen-login').style.display='none';
+    $('sidebar').style.display='flex';
+    $('main').style.display='block';
+    $('fecha-hoy').textContent = new Date().toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'});
+    cargarDashboard();
+  } else {
+    $('e-login').style.display='block';
+  }
+}
+
+function logoutAdmin(){
+  $('screen-login').style.display='flex';
+  $('sidebar').style.display='none';
+  $('main').style.display='none';
+  $('admin-pass').value='';
+}
+
+// ── Navegación ──
+function navTo(section){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(`screen-${section}`).classList.add('active');
+  const titles={dashboard:'Dashboard',clientes:'Clientes',pedidos:'Pedidos',repartidores:'Repartidores',alertas:'Alertas 45 días'};
+  $('page-title').textContent=titles[section]||section;
+  if(section==='clientes') cargarClientes();
+  if(section==='pedidos') cargarPedidos('hoy');
+  if(section==='repartidores') cargarRepartidores();
+  if(section==='alertas') cargarAlertas();
+}
+
+// ── Dashboard ──
+async function cargarDashboard(){
+  const hoy = new Date().toISOString().split('T')[0];
+  const lunes = new Date(); lunes.setDate(lunes.getDate()-lunes.getDay()+1);
+
+  const [{data:clientes},{data:pedidosHoy},{data:pedidosSemana}] = await Promise.all([
+    sb.from('clientes').select('id,estado,ultimo_pedido'),
+    sb.from('pedidos').select('id').gte('created_at',hoy),
+    sb.from('pedidos').select('monto_cobrado').gte('created_at',lunes.toISOString())
+  ]);
+
+  const activos = clientes?.filter(c=>c.estado==='activo').length||0;
+  const pendientes = clientes?.filter(c=>c.estado==='pendiente').length||0;
+  const semana = pedidosSemana?.reduce((a,p)=>a+(parseFloat(p.monto_cobrado)||0),0)||0;
+
+  $('d-activos').textContent=activos;
+  $('d-pendientes').textContent=pendientes;
+  $('d-pedidos').textContent=pedidosHoy?.length||0;
+  $('d-semana').textContent=`S/${semana.toFixed(0)}`;
+
+  if(pendientes>0){$('badge-pendientes').textContent=pendientes;$('badge-pendientes').style.display='inline';}
+
+  // Pendientes en dashboard
+  const pends = clientes?.filter(c=>c.estado==='pendiente').slice(0,5)||[];
+  if(pends.length===0){
+    $('dash-pendientes-list').innerHTML=`<div class="empty"><span class="e-ico">✅</span><p>Sin pendientes</p></div>`;
+  } else {
+    const {data:detalle} = await sb.from('clientes').select('id,nombre,apellido,dni,created_at').eq('estado','pendiente').limit(5);
+    $('dash-pendientes-list').innerHTML = detalle?.map(c=>`
+      <div class="alert-row">
+        <div class="alert-info">
+          <strong>${c.nombre} ${c.apellido}</strong>
+          <span>${c.dni} · Registrado ${formatFecha(c.created_at)}</span>
+        </div>
+        <button class="action-btn aprobar" onclick="cambiarEstado('${c.id}','activo')">Aprobar</button>
+      </div>`).join('')||'';
+  }
+
+  // Alertas en dashboard
+  const enRiesgo = clientes?.filter(c=>c.estado==='activo'&&diasDesde(c.ultimo_pedido)>=30).slice(0,5)||[];
+  if(enRiesgo.length===0){
+    $('dash-alertas-list').innerHTML=`<div class="empty"><span class="e-ico">✅</span><p>Sin alertas</p></div>`;
+  } else {
+    const ids = enRiesgo.map(c=>c.id);
+    const {data:detA} = await sb.from('clientes').select('id,nombre,apellido,distrito,ultimo_pedido').in('id',ids);
+    const alertCount = clientes?.filter(c=>c.estado==='activo'&&diasDesde(c.ultimo_pedido)>=30).length||0;
+    if(alertCount>0){$('badge-alertas').textContent=alertCount;$('badge-alertas').style.display='inline';}
+    $('dash-alertas-list').innerHTML = detA?.map(c=>{
+      const dias=diasDesde(c.ultimo_pedido);
+      return`<div class="alert-row">
+        <div class="alert-dias ${dias>=40?'':'warning'}">${dias}d</div>
+        <div class="alert-info">
+          <strong>${c.nombre} ${c.apellido}</strong>
+          <span>${c.distrito}</span>
+        </div>
+      </div>`;
+    }).join('')||'';
+  }
+}
+
+// ── Clientes ──
+async function cargarClientes(){
+  $('spin-clientes').classList.add('on');
+  $('tabla-clientes').style.display='none';
+  const {data} = await sb.from('clientes').select('*').order('created_at',{ascending:false});
+  todosClientes = data||[];
+  $('spin-clientes').classList.remove('on');
+  $('tabla-clientes').style.display='table';
+  renderClientes(todosClientes);
+}
+
+function renderClientes(lista){
+  $('tbody-clientes').innerHTML = lista.length===0
+    ? `<tr><td colspan="7"><div class="empty"><p>Sin clientes</p></div></td></tr>`
+    : lista.map(c=>{
+      const dias=diasDesde(c.ultimo_pedido);
+      return`<tr>
+        <td><strong>${c.nombre} ${c.apellido}</strong><br><span style="font-size:0.75rem;color:rgba(255,255,255,0.35)">${c.email}</span></td>
+        <td style="font-size:0.8rem">${c.dni||'—'}</td>
+        <td>${c.distrito||'—'}</td>
+        <td style="text-align:center">${c.cajones_asignados||0}</td>
+        <td style="font-size:0.8rem">${c.ultimo_pedido?`${dias}d atrás`:'Sin pedidos'}</td>
+        <td><span class="badge ${c.estado}">${c.estado}</span></td>
+        <td style="display:flex;gap:0.4rem;flex-wrap:wrap">
+          <button class="action-btn" onclick="verCliente('${c.id}')">Ver</button>
+          ${c.estado==='pendiente'?`<button class="action-btn aprobar" onclick="cambiarEstado('${c.id}','activo')">Aprobar</button>`:''}
+          ${c.estado==='activo'?`<button class="action-btn rechazar" onclick="cambiarEstado('${c.id}','inactivo')">Suspender</button>`:''}
+          ${c.estado==='inactivo'?`<button class="action-btn aprobar" onclick="cambiarEstado('${c.id}','activo')">Reactivar</button>`:''}
+        </td>
+      </tr>`;
+    }).join('');
+}
+
+function filtrarClientes(estado, btn){
+  document.querySelectorAll('#screen-clientes .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const lista = estado==='todos' ? todosClientes : todosClientes.filter(c=>c.estado===estado);
+  renderClientes(lista);
+}
+
+async function cambiarEstado(id, estado){
+  const {error} = await sb.from('clientes').update({estado}).eq('id',id);
+  if(error){toast('Error al actualizar','err');return;}
+  toast(`Cliente ${estado==='activo'?'aprobado':'suspendido'} ✓`);
+  cargarClientes();
+  cargarDashboard();
+}
+
+async function verCliente(id){
+  const c = todosClientes.find(x=>x.id===id);
+  if(!c) return;
+  $('modal-nombre').textContent=`${c.nombre} ${c.apellido}`;
+
+  // Buscar documentos en storage
+  const {data:docs} = await sb.storage.from('documentos-clientes').list(`${c.dni?.split(': ')[1]||c.dni}`,{limit:10});
+
+  // Buscar pedidos del cliente
+  const {data:pedidos} = await sb.from('pedidos').select('*').eq('cliente_id',id).order('created_at',{ascending:false}).limit(5);
+
+  $('modal-body').innerHTML=`
+    <div class="info-grid">
+      <div class="info-item"><label>Email</label><span>${c.email}</span></div>
+      <div class="info-item"><label>Teléfono</label><span>${c.telefono}</span></div>
+      <div class="info-item"><label>Documento</label><span>${c.dni}</span></div>
+      <div class="info-item"><label>Distrito</label><span>${c.distrito}</span></div>
+      <div class="info-item"><label>Dirección</label><span>${c.direccion_1||'—'}</span></div>
+      <div class="info-item"><label>Cajones asignados</label><span>${c.cajones_asignados||0}</span></div>
+      <div class="info-item"><label>Seña pagada</label><span>${c.sena_pagada?'Sí ✓':'No'}</span></div>
+      <div class="info-item"><label>Estado</label><span><span class="badge ${c.estado}">${c.estado}</span></span></div>
+      <div class="info-item"><label>Registrado</label><span>${formatFecha(c.created_at)}</span></div>
+      <div class="info-item"><label>Último pedido</label><span>${c.ultimo_pedido?`${diasDesde(c.ultimo_pedido)} días atrás`:'Sin pedidos'}</span></div>
+    </div>
+
+    ${c.notas?`<div style="background:var(--gris-medio);padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:rgba(255,255,255,0.5)">${c.notas}</div>`:''}
+
+    <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:0.75rem">Documentos de identidad</div>
+    <div class="docs-grid" id="docs-grid">
+      <div style="text-align:center"><div class="doc-img" id="doc-frente"><span>Cargando…</span></div><div class="doc-label">Frente</div></div>
+      <div style="text-align:center"><div class="doc-img" id="doc-dorso"><span>Sin doc.</span></div><div class="doc-label">Dorso</div></div>
+      <div style="text-align:center"><div class="doc-img" id="doc-selfie"><span>Sin selfie</span></div><div class="doc-label">Selfie</div></div>
+    </div>
+
+    ${pedidos&&pedidos.length>0?`
+    <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin:1rem 0 0.75rem">Últimos pedidos</div>
+    <table style="width:100%">
+      <thead><tr><th>Fecha</th><th>Monto</th><th>Estado</th></tr></thead>
+      <tbody>${pedidos.map(p=>`<tr><td>${formatFecha(p.created_at)}</td><td>S/${parseFloat(p.monto_cobrado||0).toFixed(0)}</td><td><span class="badge ${p.estado}">${p.estado}</span></td></tr>`).join('')}</tbody>
+    </table>`:''}
+
+    <div class="modal-actions">
+      ${c.estado==='pendiente'?`<button class="btn-p" onclick="cambiarEstado('${c.id}','activo');cerrarModal()">✓ Aprobar cliente</button>`:''}
+      ${c.estado==='activo'?`<button class="btn-p" style="background:var(--rojo);color:var(--blanco)" onclick="cambiarEstado('${c.id}','inactivo');cerrarModal()">Suspender</button>`:''}
+      ${c.estado==='inactivo'?`<button class="btn-p" onclick="cambiarEstado('${c.id}','activo');cerrarModal()">Reactivar</button>`:''}
+    </div>
+  `;
+
+  // Cargar documentos
+  if(docs && docs.length>0){
+    const tipos=['frente','dorso','selfie'];
+    for(const tipo of tipos){
+      const archivo = docs.find(d=>d.name.startsWith(tipo));
+      if(archivo){
+        const carpeta = c.notas?.match(/Docs: ([^\s.]+)/)?.[1]||'';
+        const {data:url} = sb.storage.from('documentos-clientes').getPublicUrl(`${carpeta}/${archivo.name}`);
+        if(url){
+          $(`doc-${tipo}`).innerHTML=`<img src="${url.publicUrl}" alt="${tipo}">`;
+        }
+      }
+    }
+  }
+
+  $('modal-cliente').classList.add('open');
+}
+
+function cerrarModal(){ $('modal-cliente').classList.remove('open'); }
+
+// ── Pedidos ──
+async function cargarPedidos(rango){
+  $('spin-pedidos').classList.add('on');
+  $('tabla-pedidos').style.display='none';
+  const hoy=new Date().toISOString().split('T')[0];
+  const lunes=new Date(); lunes.setDate(lunes.getDate()-lunes.getDay()+1);
+  const desde = rango==='semana' ? lunes.toISOString() : hoy;
+  const {data} = await sb.from('pedidos').select('*, clientes:cliente_id(nombre,apellido), repartidores:repartidor_id(nombre)').gte('created_at',desde).order('created_at',{ascending:false});
+  todosPedidos=data||[];
+  $('spin-pedidos').classList.remove('on');
+  $('tabla-pedidos').style.display='table';
+  $('tbody-pedidos').innerHTML = todosPedidos.length===0
+    ? `<tr><td colspan="7"><div class="empty"><p>Sin pedidos</p></div></td></tr>`
+    : todosPedidos.map(p=>`<tr>
+        <td>${formatHora(p.created_at)}</td>
+        <td>${p.clientes?`${p.clientes.nombre} ${p.clientes.apellido}`:p.notas?.split('Cliente:')[1]?.split('.')[0]?.trim()||'—'}</td>
+        <td>${p.distrito||'—'}</td>
+        <td><span class="badge ${p.tipo_venta||'delivery'}">${p.tipo_venta||'delivery'}</span></td>
+        <td style="text-align:center">${(p.cajones_recibidos||0)*6+' sif.'}</td>
+        <td>S/${parseFloat(p.monto_cobrado||0).toFixed(0)}</td>
+        <td><span class="badge ${p.estado}">${p.estado}</span></td>
+      </tr>`).join('');
+}
+
+function filtrarPedidos(rango,btn){
+  document.querySelectorAll('#screen-pedidos .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  cargarPedidos(rango);
+}
+
+// ── Repartidores ──
+async function cargarRepartidores(){
+  const lunes=new Date(); lunes.setDate(lunes.getDate()-lunes.getDay()+1);
+  const {data:reps} = await sb.from('repartidores').select('*').eq('activo',true);
+  const {data:pedidos} = await sb.from('pedidos').select('repartidor_id,monto_cobrado,cajones_recibidos').gte('created_at',lunes.toISOString());
+
+  $('rendicion-wrap').innerHTML = reps?.map(r=>{
+    const mis = pedidos?.filter(p=>p.repartidor_id===r.id)||[];
+    const total = mis.reduce((a,p)=>a+(parseFloat(p.monto_cobrado)||0),0);
+    const sifones = mis.reduce((a,p)=>a+(p.cajones_recibidos||0)*6,0);
+    return`<div class="rendicion-card">
+      <h3>🚴 ${r.nombre} <span style="color:rgba(255,255,255,0.3);font-size:0.8rem">· ${(r.zonas||[]).join(', ')}</span></h3>
+      <div class="rendicion-stats">
+        <div class="r-stat"><div class="r-n">${mis.length}</div><div class="r-l">Entregas semana</div></div>
+        <div class="r-stat"><div class="r-n">${sifones}</div><div class="r-l">Sifones</div></div>
+        <div class="r-stat"><div class="r-n" style="color:var(--verde)">S/${total.toFixed(0)}</div><div class="r-l">A rendir</div></div>
+      </div>
+    </div>`;
+  }).join('')||`<div class="empty"><span class="e-ico">🚴</span><p>Sin repartidores</p></div>`;
+}
+
+// ── Alertas ──
+async function cargarAlertas(){
+  const {data} = await sb.from('clientes').select('*').eq('estado','activo').order('ultimo_pedido',{ascending:true});
+  const enRiesgo = (data||[]).filter(c=>diasDesde(c.ultimo_pedido)>=30);
+  const alertCount = enRiesgo.length;
+  if(alertCount>0){$('badge-alertas').textContent=alertCount;$('badge-alertas').style.display='inline';}
+
+  $('alertas-list').innerHTML = enRiesgo.length===0
+    ? `<div class="empty"><span class="e-ico">✅</span><p>Sin clientes en riesgo</p></div>`
+    : enRiesgo.map(c=>{
+      const dias=diasDesde(c.ultimo_pedido);
+      return`<div class="alert-row">
+        <div class="alert-dias ${dias>=40?'':'warning'}">${dias}d</div>
+        <div class="alert-info">
+          <strong>${c.nombre} ${c.apellido}</strong>
+          <span>${c.telefono} · ${c.distrito} · ${c.cajones_asignados} cajón/es</span>
+        </div>
+        <div style="display:flex;gap:0.5rem">
+          <button class="action-btn" onclick="verCliente('${c.id}')">Ver</button>
+          <a href="https://wa.me/${c.telefono?.replace(/[^0-9]/g,'')}?text=Hola%20${encodeURIComponent(c.nombre)}%2C%20hace%20${dias}%20días%20que%20no%20hacés%20un%20pedido.%20¿Necesitás%20recarga%20de%20soda%3F%20🥤" target="_blank" class="action-btn" style="text-decoration:none">WhatsApp</a>
+        </div>
+      </div>`;
+    }).join('');
+    
+  // Cargar clientes para el modal
+  if(!todosClientes.length){ const {data:todos}=await sb.from('clientes').select('*'); todosClientes=todos||[]; }
+}
+</script>
+</body>
+</html>
