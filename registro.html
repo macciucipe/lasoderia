@@ -160,7 +160,26 @@ textarea { resize:vertical; min-height:90px; }
       <input type="text" id="dni" inputmode="numeric" placeholder="12345678" maxlength="8">
       <div class="ferr" id="e-dni">DNI debe tener 8 dígitos</div>
     </div>
-    <div class="fg"><label>WhatsApp *</label><input type="tel" id="tel" placeholder="+51 999 999 999"><div class="ferr" id="e-tel">Ingresá tu número</div></div>
+    <div class="fg"><label>WhatsApp *</label>
+      <div style="display:flex;gap:0.75rem">
+        <input type="tel" id="tel" placeholder="+51 999 999 999" style="flex:1">
+        <button type="button" onclick="enviarOTP()" id="btn-otp" class="btn-s" style="white-space:nowrap;clip-path:none;padding:0 1.2rem;font-size:0.8rem">Enviar código</button>
+      </div>
+      <div class="ferr" id="e-tel">Ingresá tu número</div>
+    </div>
+
+    <div class="fg" id="fg-otp" style="display:none">
+      <label>Código de verificación *</label>
+      <div style="display:flex;gap:0.75rem">
+        <input type="text" id="otp-code" inputmode="numeric" maxlength="6" placeholder="123456" style="flex:1;letter-spacing:0.3em;font-size:1.2rem;text-align:center">
+        <button type="button" onclick="verificarOTP()" id="btn-verificar" class="btn-s" style="white-space:nowrap;clip-path:none;padding:0 1.2rem;font-size:0.8rem">Verificar</button>
+      </div>
+      <div style="font-size:0.78rem;color:rgba(255,255,255,0.35);margin-top:0.4rem">Revisá tu WhatsApp — el código llega en segundos</div>
+      <div class="ferr" id="e-otp">Código incorrecto o expirado</div>
+    </div>
+    <div class="fg" id="fg-tel-ok" style="display:none">
+      <div style="color:var(--verde);font-size:0.85rem;padding:0.5rem 0">✓ Teléfono verificado correctamente</div>
+    </div>
     <div class="fg"><label>Correo electrónico *</label><input type="email" id="email" placeholder="juan@correo.com"><div class="ferr" id="e-email">Ingresá un correo válido</div></div>
     <div class="btnrow"><button class="btn-s" onclick="ir(2)">Siguiente →</button></div>
   </div>
@@ -319,7 +338,65 @@ let paso = 1, dir1OK = false;
 const ZONAS = ['miraflores','san isidro','barranco','santiago de surco','surco','la molina','san borja','jesús maría','jesus maria','lince','pueblo libre','magdalena del mar','magdalena','san miguel','chorrillos'];
 const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 
-function cambiarDoc() {
+let telVerificado = false;
+
+async function enviarOTP() {
+  const tel = $('tel').value.trim();
+  if (tel.length < 7) { $('e-tel').classList.add('on'); return; }
+  $('e-tel').classList.remove('on');
+  const btn = $('btn-otp');
+  btn.textContent = 'Enviando…'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telefono: tel })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      $('fg-otp').style.display = 'block';
+      btn.textContent = 'Reenviar';
+      btn.disabled = false;
+    } else {
+      alert(data.error || 'No se pudo enviar el código.');
+      btn.textContent = 'Enviar código'; btn.disabled = false;
+    }
+  } catch(e) {
+    alert('Error de conexión. Intentá de nuevo.'); btn.textContent = 'Enviar código'; btn.disabled = false;
+  }
+}
+
+async function verificarOTP() {
+  const tel = $('tel').value.trim();
+  const codigo = $('otp-code').value.trim();
+  if (!codigo) { $('e-otp').textContent = 'Ingresá el código'; $('e-otp').classList.add('on'); return; }
+  const btn = $('btn-verificar');
+  btn.textContent = 'Verificando…'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telefono: tel, codigo })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      telVerificado = true;
+      $('fg-otp').style.display = 'none';
+      $('fg-tel-ok').style.display = 'block';
+      $('btn-otp').style.display = 'none';
+      $('tel').readOnly = true;
+      $('e-otp').classList.remove('on');
+    } else {
+      $('e-otp').textContent = data.error || 'Código incorrecto';
+      $('e-otp').classList.add('on');
+      btn.textContent = 'Verificar'; btn.disabled = false;
+    }
+  } catch(e) {
+    alert('Error de conexión.'); btn.textContent = 'Verificar'; btn.disabled = false;
+  }
+}
+
+
   const t = $('tipo-doc').value;
   $('lbl-doc').textContent = t==='DNI' ? 'Número de DNI *' : 'Número de CE *';
   $('dni').placeholder = t==='DNI' ? '12345678' : '001234567';
@@ -373,6 +450,7 @@ function validar(n) {
     $('e-dni').textContent = t==='DNI'?'DNI debe tener 8 dígitos':'CE debe tener 9 dígitos';
     ok = v('dni', s=>t==='DNI'?/^\d{8}$/.test(s):/^\d{9}$/.test(s),'e-dni') && ok;
     ok = v('tel', s=>s.length>=7,'e-tel') && ok;
+    if (!telVerificado) { $('e-tel').textContent = 'Debés verificar tu WhatsApp antes de continuar'; $('e-tel').classList.add('on'); ok=false; }
     ok = v('email', s=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s),'e-email') && ok;
     return ok;
   }
