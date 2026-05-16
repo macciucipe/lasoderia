@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registrarme — La Sodería ATR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --negro: #000000;
+  --amarillo: #ffc000;
+  --azul: #0000ff;
+  --blanco: #ffffff;
+  --gris: #111111;
+  --gris-medio: #1e1e1e;
+  --verde: #00cc44;
+  --rojo: #ff3333;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--negro);
+  color: var(--blanco);
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+}
+
+/* ─── NAV ─── */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 3rem; height: 64px;
+  background: var(--negro);
+  border-bottom: 2px solid var(--amarillo);
+}
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem; color: var(--amarillo);
+  text-decoration: none; letter-spacing: 0.08em;
+}
+.nav-logo span { color: var(--azul); }
+.nav-back {
+  color: rgba(255,255,255,0.5); text-decoration: none;
+  font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
+  transition: color 0.2s;
+}
+.nav-back:hover { color: var(--amarillo); }
+
+/* ─── LAYOUT ─── */
+.registro-wrap {
+  max-width: 680px; margin: 0 auto;
+  padding: 4rem 2rem 6rem;
+}
+.registro-header { margin-bottom: 3rem; }
+.registro-header p {
+  font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--azul); margin-bottom: 0.5rem;
+}
+.registro-header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  line-height: 0.95; color: var(--blanco);
+}
+.registro-header h1 em { color: var(--amarillo); font-style: normal; }
+
+/* ─── PASOS ─── */
+.pasos-nav {
+  display: flex; gap: 0; margin-bottom: 3rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.paso-tab {
+  flex: 1; padding: 0.75rem 0.5rem;
+  text-align: center; font-size: 0.72rem;
+  font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.paso-tab.activo {
+  color: var(--amarillo);
+  border-bottom-color: var(--amarillo);
+}
+.paso-tab.completado {
+  color: var(--verde);
+  border-bottom-color: var(--verde);
+}
+.paso-tab span {
+  display: block; font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem; letter-spacing: 0.05em;
+  margin-bottom: 0.1rem;
+}
+
+/* ─── PASOS CONTENIDO ─── */
+.paso-contenido { display: none; }
+.paso-contenido.activo { display: block; }
+
+/* ─── FORM ─── */
+.form-group { margin-bottom: 1.5rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+label {
+  display: block; font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); margin-bottom: 0.5rem;
+}
+input, select, textarea {
+  width: 100%; padding: 0.85rem 1rem;
+  background: var(--gris-medio);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  color: var(--blanco);
+  font-family: 'Barlow', sans-serif; font-size: 0.95rem;
+  outline: none; transition: border-color 0.2s;
+  appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--amarillo);
+}
+input.error, select.error { border-color: var(--rojo); }
+input.ok { border-color: var(--verde); }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ffffff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  background-color: var(--gris-medio);
+}
+select option { background: var(--gris); }
+.field-error {
+  font-size: 0.78rem; color: var(--rojo);
+  margin-top: 0.4rem; display: none;
+}
+.field-error.visible { display: block; }
+textarea { resize: vertical; min-height: 90px; }
+
+/* ─── DIRECCIÓN EXTRA ─── */
+.add-dir-btn {
+  background: none; border: 1px dashed rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.4); padding: 0.6rem 1rem;
+  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; width: 100%; transition: all 0.2s;
+  font-family: 'Barlow', sans-serif;
+}
+.add-dir-btn:hover { border-color: var(--amarillo); color: var(--amarillo); }
+
+/* ─── TYC ─── */
+.tyc-box {
+  background: var(--gris-medio);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 1.5rem; max-height: 220px;
+  overflow-y: auto; margin-bottom: 1.5rem;
+  font-size: 0.83rem; color: rgba(255,255,255,0.55);
+  line-height: 1.7;
+}
+.tyc-box h4 {
+  color: var(--blanco); font-size: 0.88rem;
+  margin-bottom: 0.75rem; font-weight: 700;
+}
+.tyc-box p { margin-bottom: 0.75rem; }
+.tyc-box::-webkit-scrollbar { width: 3px; }
+.tyc-box::-webkit-scrollbar-thumb { background: var(--amarillo); }
+.check-row {
+  display: flex; gap: 0.75rem; align-items: flex-start;
+  margin-bottom: 1rem; cursor: pointer;
+}
+.check-row input[type="checkbox"] {
+  width: 18px; height: 18px; min-width: 18px;
+  accent-color: var(--amarillo); cursor: pointer;
+  margin-top: 2px;
+}
+.check-row span { font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.5; }
+.check-row a { color: var(--amarillo); }
+
+/* ─── SEÑA INFO ─── */
+.sena-info {
+  background: rgba(255,192,0,0.06);
+  border: 1px solid rgba(255,192,0,0.2);
+  border-left: 4px solid var(--amarillo);
+  padding: 1.5rem; margin-bottom: 2rem;
+}
+.sena-info h4 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem; font-weight: 900;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--amarillo); margin-bottom: 0.75rem;
+}
+.sena-info p { font-size: 0.85rem; color: rgba(255,255,255,0.65); line-height: 1.65; }
+.sena-monto {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.5rem; color: var(--amarillo);
+  display: block; margin: 0.5rem 0;
+}
+.transferencia-datos {
+  background: var(--gris-medio);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 1.2rem 1.5rem; margin: 1rem 0;
+}
+.transferencia-datos p {
+  font-size: 0.85rem; color: rgba(255,255,255,0.6);
+  margin-bottom: 0.4rem;
+}
+.transferencia-datos strong { color: var(--blanco); }
+
+/* ─── BOTONES ─── */
+.btn-siguiente {
+  background: var(--amarillo); color: var(--negro);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem; font-weight: 900;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 1rem 2.5rem; border: none; cursor: pointer;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  transition: background 0.15s, transform 0.15s;
+  display: inline-block;
+}
+.btn-siguiente:hover { background: var(--blanco); transform: translateY(-1px); }
+.btn-siguiente:disabled { background: rgba(255,192,0,0.3); color: rgba(0,0,0,0.4); cursor: not-allowed; transform: none; }
+.btn-anterior {
+  background: transparent; color: rgba(255,255,255,0.4);
+  font-family: 'Barlow', sans-serif; font-size: 0.85rem;
+  border: none; cursor: pointer; padding: 1rem 1.5rem;
+  transition: color 0.2s;
+}
+.btn-anterior:hover { color: var(--blanco); }
+.btn-row { display: flex; align-items: center; gap: 1rem; margin-top: 2rem; }
+
+/* ─── ÉXITO ─── */
+#paso-exito {
+  text-align: center; padding: 3rem 0;
+}
+.exito-icono {
+  width: 80px; height: 80px;
+  background: var(--verde); margin: 0 auto 2rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+  clip-path: polygon(15px 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%);
+}
+#paso-exito h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem; color: var(--blanco); margin-bottom: 1rem;
+}
+#paso-exito h2 em { color: var(--amarillo); font-style: normal; }
+#paso-exito p { color: rgba(255,255,255,0.55); line-height: 1.7; max-width: 480px; margin: 0 auto 1rem; }
+
+/* ─── SEPARADOR ─── */
+.sep {
+  border: none; border-top: 1px solid rgba(255,255,255,0.06);
+  margin: 2rem 0;
+}
+
+/* ─── LOADING ─── */
+.loading {
+  display: none; align-items: center; gap: 0.75rem;
+  color: rgba(255,255,255,0.5); font-size: 0.85rem;
+}
+.loading.visible { display: flex; }
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--amarillo);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+  nav { padding: 0 1rem; }
+  .registro-wrap { padding: 2rem 1rem 4rem; }
+  .form-row { grid-template-columns: 1fr; }
+  .pasos-nav { overflow-x: auto; }
+  .paso-tab { min-width: 80px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">La <span>Sodería</span> ATR</a>
+  <a href="index.html" class="nav-back">← Volver al inicio</a>
+</nav>
+
+<div class="registro-wrap">
+
+  <div class="registro-header">
+    <p>Nuevo cliente</p>
+    <h1>REGISTRATE<br>EN <em>LA SODERÍA</em></h1>
+  </div>
+
+  <!-- INDICADOR DE PASOS -->
+  <div class="pasos-nav">
+    <div class="paso-tab activo" id="tab-1"><span>01</span>Tus datos</div>
+    <div class="paso-tab" id="tab-2"><span>02</span>Dirección</div>
+    <div class="paso-tab" id="tab-3"><span>03</span>Términos</div>
+    <div class="paso-tab" id="tab-4"><span>04</span>La seña</div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- PASO 1 — DATOS PERSONALES         -->
+  <!-- ══════════════════════════════════ -->
+  <div class="paso-contenido activo" id="paso-1">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nombre *</label>
+        <input type="text" id="nombre" placeholder="Juan">
+        <div class="field-error" id="err-nombre">Ingresá tu nombre</div>
+      </div>
+      <div class="form-group">
+        <label>Apellido *</label>
+        <input type="text" id="apellido" placeholder="García">
+        <div class="field-error" id="err-apellido">Ingresá tu apellido</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>DNI *</label>
+      <input type="text" id="dni" placeholder="12345678" maxlength="8">
+      <div class="field-error" id="err-dni">Ingresá un DNI válido (8 dígitos)</div>
+    </div>
+    <div class="form-group">
+      <label>WhatsApp / Teléfono *</label>
+      <input type="tel" id="telefono" placeholder="+51 999 999 999">
+      <div class="field-error" id="err-telefono">Ingresá tu número de WhatsApp</div>
+    </div>
+    <div class="form-group">
+      <label>Correo electrónico *</label>
+      <input type="email" id="email" placeholder="juan@correo.com">
+      <div class="field-error" id="err-email">Ingresá un correo válido</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-siguiente" onclick="irPaso(2)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- PASO 2 — DIRECCIÓN                -->
+  <!-- ══════════════════════════════════ -->
+  <div class="paso-contenido" id="paso-2">
+    <div class="form-group">
+      <label>Distrito *</label>
+      <select id="distrito">
+        <option value="">Seleccioná tu distrito…</option>
+        <option>Miraflores</option>
+        <option>San Isidro</option>
+        <option>Barranco</option>
+        <option>Surco</option>
+        <option>La Molina</option>
+        <option>San Borja</option>
+        <option>Jesús María</option>
+        <option>Lince</option>
+        <option>Pueblo Libre</option>
+        <option>Magdalena</option>
+        <option>San Miguel</option>
+        <option>Chorrillos</option>
+      </select>
+      <div class="field-error" id="err-distrito">Seleccioná un distrito</div>
+    </div>
+    <div class="form-group">
+      <label>Dirección principal *</label>
+      <input type="text" id="direccion1" placeholder="Av. Principal 123, Dpto. 4B">
+      <div class="field-error" id="err-direccion1">Ingresá tu dirección</div>
+    </div>
+    <div class="form-group" id="grupo-dir2" style="display:none">
+      <label>Segunda dirección (opcional)</label>
+      <input type="text" id="direccion2" placeholder="Otra dirección de entrega">
+    </div>
+    <button class="add-dir-btn" onclick="toggleDir2()" id="btn-add-dir">
+      + Agregar segunda dirección de entrega
+    </button>
+    <div class="btn-row">
+      <button class="btn-anterior" onclick="irPaso(1)">← Anterior</button>
+      <button class="btn-siguiente" onclick="irPaso(3)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- PASO 3 — TÉRMINOS Y CONDICIONES   -->
+  <!-- ══════════════════════════════════ -->
+  <div class="paso-contenido" id="paso-3">
+    <div class="tyc-box">
+      <h4>Términos y Condiciones — La Sodería ATR</h4>
+
+      <p><strong>1. El servicio</strong><br>
+      La Sodería ATR provee soda carbonatada en sifones retornables a domicilio en Lima Metropolitana. El cliente no adquiere los sifones ni los cajones en propiedad — los recibe en préstamo bajo depósito (seña).</p>
+
+      <p><strong>2. La seña (depósito)</strong><br>
+      Al activar su cuenta, el cliente abona una seña de S/ 5 por cada sifón y S/ 20 por cada cajón, resultando en S/ 50 por cajón completo. Esta seña es un depósito en garantía y será devuelta íntegramente al momento de la devolución de los equipos en buen estado.</p>
+
+      <p><strong>3. Costo real del equipo</strong><br>
+      El valor real de cada sifón es de USD 20 y el cajón es de USD 80, totalizando USD 200 por cajón. La seña no cubre la totalidad de este valor. En caso de no devolución o pérdida de equipos, el cliente deberá abonar la diferencia entre la seña pagada y el costo real del equipo, según el tipo de cambio vigente al momento del incidente.</p>
+
+      <p><strong>4. Regla de inactividad</strong><br>
+      Si el cliente no realiza ningún pedido de recarga durante 45 días corridos, La Sodería ATR se comunicará para coordinar la devolución de los equipos. Una vez devueltos en buen estado, la seña será reintegrada en un plazo máximo de 7 días hábiles.</p>
+
+      <p><strong>5. Pedidos y entregas</strong><br>
+      Los pedidos se realizan exclusivamente a través del número de WhatsApp registrado en la cuenta. El cobro de cada recarga es realizado por el repartidor asignado al momento de la entrega, en efectivo.</p>
+
+      <p><strong>6. Cantidad máxima de cajones</strong><br>
+      Sin autorización especial, cada cliente puede tener hasta 2 cajones en su poder de forma simultánea.</p>
+
+      <p><strong>7. Cancelación del servicio</strong><br>
+      El cliente puede cancelar el servicio en cualquier momento con 7 días de anticipación, coordinando la devolución de equipos y la restitución de la seña.</p>
+
+      <p><strong>8. Protección de datos personales</strong><br>
+      Los datos personales proporcionados durante el registro (nombre, DNI, teléfono, correo, dirección) son recopilados exclusivamente para la prestación del servicio y la verificación de identidad, en cumplimiento con la Ley N° 29733 — Ley de Protección de Datos Personales del Perú. En ningún caso serán utilizados con fines de marketing, ni compartidos con terceros sin consentimiento expreso del titular. El cliente tiene derecho a solicitar la actualización, corrección o eliminación de sus datos en cualquier momento.</p>
+    </div>
+
+    <label class="check-row">
+      <input type="checkbox" id="check-tyc">
+      <span>He leído y acepto los <a href="#">Términos y Condiciones</a>, incluyendo las condiciones sobre la seña, el costo real del equipo y la regla de los 45 días de inactividad.</span>
+    </label>
+
+    <label class="check-row">
+      <input type="checkbox" id="check-datos">
+      <span>Acepto el tratamiento de mis datos personales conforme a la Ley N° 29733 y confirmo que la información proporcionada es verídica.</span>
+    </label>
+
+    <div class="btn-row">
+      <button class="btn-anterior" onclick="irPaso(2)">← Anterior</button>
+      <button class="btn-siguiente" onclick="irPaso(4)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- PASO 4 — LA SEÑA                  -->
+  <!-- ══════════════════════════════════ -->
+  <div class="paso-contenido" id="paso-4">
+    <div class="sena-info">
+      <h4>¿Cuántos cajones querés?</h4>
+      <p>Cada cajón incluye 6 sifones. Podés tener hasta 2 cajones sin autorización especial.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Cantidad de cajones *</label>
+      <select id="cajones" onchange="calcularSena()">
+        <option value="1">1 cajón — 6 sifones</option>
+        <option value="2">2 cajones — 12 sifones</option>
+      </select>
+    </div>
+
+    <div class="sena-info">
+      <h4>Total a depositar</h4>
+      <span class="sena-monto" id="monto-sena">S/ 50</span>
+      <p id="detalle-sena">1 cajón × S/50 = S/50 de seña</p>
+    </div>
+
+    <hr class="sep">
+
+    <div class="sena-info">
+      <h4>Datos para la transferencia</h4>
+      <p>Realizá la transferencia y adjuntá el comprobante. Verificamos el pago y activamos tu cuenta en menos de 24 horas.</p>
+      <div class="transferencia-datos">
+        <p><strong>Banco:</strong> BCP</p>
+        <p><strong>Titular:</strong> La Sodería ATR S.A.C.</p>
+        <p><strong>Cuenta corriente:</strong> 000-0000000-0-00</p>
+        <p><strong>CCI:</strong> 00000000000000000000</p>
+        <p><strong>Yape:</strong> +51 999 000 000</p>
+      </div>
+      <p style="margin-top:0.5rem">⚠️ En el concepto de la transferencia escribí tu <strong>DNI</strong>.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Número de operación / comprobante *</label>
+      <input type="text" id="comprobante" placeholder="Ej: 123456789">
+      <div class="field-error" id="err-comprobante">Ingresá el número de operación</div>
+    </div>
+
+    <div class="form-group">
+      <label>Notas adicionales (opcional)</label>
+      <textarea id="notas" placeholder="Referencia de dirección, portero, horario preferido…"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-anterior" onclick="irPaso(3)">← Anterior</button>
+      <button class="btn-siguiente" id="btn-enviar" onclick="enviarRegistro()">Confirmar registro →</button>
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <span>Guardando tu registro…</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- ÉXITO                             -->
+  <!-- ══════════════════════════════════ -->
+  <div id="paso-exito" style="display:none">
+    <div class="exito-icono">✓</div>
+    <h2>¡REGISTRO<br><em>RECIBIDO!</em></h2>
+    <p>Recibimos tu solicitud y el comprobante de pago. En menos de 24 horas verificamos la transferencia y activamos tu cuenta.</p>
+    <p>Te vamos a escribir al WhatsApp que registraste para confirmarte todo.</p>
+    <br>
+    <a href="index.html" class="btn-siguiente" style="text-decoration:none">← Volver al inicio</a>
+  </div>
+
+</div>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://rnyevcqqsjharrncswpl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_LRKrU-Pjchfp7Y1PqBRxWg_11BekgEF';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let pasoActual = 1;
+
+// ── Navegación entre pasos ──
+function irPaso(n) {
+  if (n > pasoActual && !validarPaso(pasoActual)) return;
+
+  document.getElementById(`paso-${pasoActual}`).classList.remove('activo');
+  document.getElementById(`tab-${pasoActual}`).classList.remove('activo');
+  document.getElementById(`tab-${pasoActual}`).classList.add('completado');
+
+  pasoActual = n;
+  document.getElementById(`paso-${n}`).classList.add('activo');
+  document.getElementById(`tab-${n}`).classList.remove('completado');
+  document.getElementById(`tab-${n}`).classList.add('activo');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Validación por paso ──
+function validarPaso(n) {
+  let ok = true;
+
+  if (n === 1) {
+    ok = validarCampo('nombre', v => v.length >= 2, 'err-nombre') && ok;
+    ok = validarCampo('apellido', v => v.length >= 2, 'err-apellido') && ok;
+    ok = validarCampo('dni', v => /^\d{8}$/.test(v), 'err-dni') && ok;
+    ok = validarCampo('telefono', v => v.length >= 7, 'err-telefono') && ok;
+    ok = validarCampo('email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), 'err-email') && ok;
+  }
+
+  if (n === 2) {
+    ok = validarCampo('distrito', v => v !== '', 'err-distrito') && ok;
+    ok = validarCampo('direccion1', v => v.length >= 5, 'err-direccion1') && ok;
+  }
+
+  if (n === 3) {
+    const tyc = document.getElementById('check-tyc').checked;
+    const datos = document.getElementById('check-datos').checked;
+    if (!tyc || !datos) {
+      alert('Debés aceptar los términos y condiciones para continuar.');
+      return false;
+    }
+  }
+
+  return ok;
+}
+
+function validarCampo(id, fn, errId) {
+  const val = document.getElementById(id).value.trim();
+  const ok = fn(val);
+  document.getElementById(id).classList.toggle('error', !ok);
+  document.getElementById(id).classList.toggle('ok', ok);
+  document.getElementById(errId).classList.toggle('visible', !ok);
+  return ok;
+}
+
+// ── Segunda dirección ──
+function toggleDir2() {
+  const grupo = document.getElementById('grupo-dir2');
+  const btn = document.getElementById('btn-add-dir');
+  const visible = grupo.style.display !== 'none';
+  grupo.style.display = visible ? 'none' : 'block';
+  btn.textContent = visible ? '+ Agregar segunda dirección de entrega' : '− Quitar segunda dirección';
+}
+
+// ── Calcular seña ──
+function calcularSena() {
+  const cajones = parseInt(document.getElementById('cajones').value);
+  const total = cajones * 50;
+  document.getElementById('monto-sena').textContent = `S/ ${total}`;
+  document.getElementById('detalle-sena').textContent =
+    `${cajones} cajón${cajones > 1 ? 'es' : ''} × S/50 = S/${total} de seña`;
+}
+
+// ── Enviar registro a Supabase ──
+async function enviarRegistro() {
+  if (!validarCampo('comprobante', v => v.length >= 3, 'err-comprobante')) return;
+
+  const btn = document.getElementById('btn-enviar');
+  const loading = document.getElementById('loading');
+  btn.style.display = 'none';
+  loading.classList.add('visible');
+
+  const data = {
+    nombre: document.getElementById('nombre').value.trim(),
+    apellido: document.getElementById('apellido').value.trim(),
+    dni: document.getElementById('dni').value.trim(),
+    telefono: document.getElementById('telefono').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    direccion_1: document.getElementById('direccion1').value.trim(),
+    direccion_2: document.getElementById('direccion2').value.trim() || null,
+    distrito: document.getElementById('distrito').value,
+    cajones_asignados: parseInt(document.getElementById('cajones').value),
+    estado: 'pendiente',
+    sena_pagada: false,
+    notas: `Comprobante: ${document.getElementById('comprobante').value.trim()}. ${document.getElementById('notas').value.trim()}`
+  };
+
+  try {
+    const { error } = await sb.from('clientes').insert([data]);
+
+    if (error) throw error;
+
+    // Éxito
+    document.getElementById('paso-4').classList.remove('activo');
+    document.querySelectorAll('.pasos-nav').forEach(el => el.style.display = 'none');
+    document.getElementById('paso-exito').style.display = 'block';
+
+  } catch (err) {
+    loading.classList.remove('visible');
+    btn.style.display = 'inline-block';
+
+    if (err.message && err.message.includes('duplicate')) {
+      alert('Ya existe una cuenta con ese DNI, teléfono o email. Si ya estás registrado, escribinos por WhatsApp.');
+    } else {
+      alert('Hubo un problema al guardar tu registro. Por favor intentá de nuevo o escribinos por WhatsApp.');
+    }
+    console.error(err);
+  }
+}
+</script>
+</body>
+</html>
