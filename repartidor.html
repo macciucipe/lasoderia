@@ -364,19 +364,26 @@ async function buscarCliente() {
   $('spin-buscar').classList.add('on');
   clienteActual = null;
 
-  // Normalizar búsqueda — agregar +51 si es número sin prefijo
-  const qLimpio = q.replace(/\s+/g,'');
-  const qConPrefijo = qLimpio.startsWith('+') ? qLimpio : `+51${qLimpio}`;
-
-  const { data, error } = await sb
+  // Buscar por DNI (contiene el número ingresado)
+  const { data: porDni } = await sb
     .from('clientes')
     .select('*')
-    .or(`dni.ilike.%${q}%,telefono.ilike.%${qLimpio}%,telefono.ilike.%${qConPrefijo}%`)
+    .ilike('dni', `%${q}%`)
+    .limit(1);
+
+  // Buscar por teléfono — probamos con y sin +51
+  const qTel = q.replace(/\s+/g,'');
+  const { data: porTel } = await sb
+    .from('clientes')
+    .select('*')
+    .or(`telefono.ilike.%${qTel}%`)
     .limit(1);
 
   $('spin-buscar').classList.remove('on');
 
-  const cliente = data && data.length > 0 ? data[0] : null;
+  const cliente = (porDni && porDni.length > 0)
+    ? porDni[0]
+    : (porTel && porTel.length > 0 ? porTel[0] : null);
 
   if (cliente) {
     clienteActual = cliente;
