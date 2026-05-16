@@ -1,0 +1,60 @@
+const otps = {};
+
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', 'https://www.lasoderia.pe');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
+
+  const { telefono } = req.body;
+  if (!telefono) return res.status(400).json({ error: 'Teléfono requerido' });
+
+  // Limpiar número — solo dígitos con código de país
+  const numLimpio = telefono.replace(/\s+/g, '').replace(/[^\d+]/g, '');
+  const numWA = numLimpio.startsWith('+') ? numLimpio : `+51${numLimpio}`;
+
+  // Generar código de 6 dígitos
+  const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Guardar con expiración de 10 minutos
+  otps[numWA] = { codigo, expira: Date.now() + 10 * 60 * 1000 };
+
+  try {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const from = process.env.TWILIO_WHATSAPP_FROM;
+
+    const body = `🥤 *La Sodería ATR*\n\nTu código de verificación es:\n\n*${codigo}*\n\nVálido por 10 minutos. No lo compartas con nadie.`;
+
+    const response = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          From: from,
+          To: `whatsapp:${numWA}`,
+          Body: body,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.error_code) {
+      console.error('Twilio error:', data);
+      return res.status(400).json({ error: 'No se pudo enviar el mensaje. Verificá el número.' });
+    }
+
+    return res.status(200).json({ ok: true, mensaje: 'Código enviado por WhatsApp' });
+
+  } catch (err) {
+    console.error('Error:', err);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
+}
