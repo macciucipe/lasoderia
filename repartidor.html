@@ -364,26 +364,32 @@ async function buscarCliente() {
   $('spin-buscar').classList.add('on');
   clienteActual = null;
 
-  const { data } = await sb
+  // Normalizar búsqueda — agregar +51 si es número sin prefijo
+  const qLimpio = q.replace(/\s+/g,'');
+  const qConPrefijo = qLimpio.startsWith('+') ? qLimpio : `+51${qLimpio}`;
+
+  const { data, error } = await sb
     .from('clientes')
     .select('*')
-    .or(`dni.ilike.%${q}%,telefono.ilike.%${q}%`)
-    .single();
+    .or(`dni.ilike.%${q}%,telefono.ilike.%${qLimpio}%,telefono.ilike.%${qConPrefijo}%`)
+    .limit(1);
 
   $('spin-buscar').classList.remove('on');
 
-  if (data) {
-    clienteActual = data;
-    const diasSinPedido = data.ultimo_pedido
-      ? Math.floor((Date.now() - new Date(data.ultimo_pedido)) / 86400000)
+  const cliente = data && data.length > 0 ? data[0] : null;
+
+  if (cliente) {
+    clienteActual = cliente;
+    const diasSinPedido = cliente.ultimo_pedido
+      ? Math.floor((Date.now() - new Date(cliente.ultimo_pedido)) / 86400000)
       : null;
-    const badgeClass = data.estado === 'activo' ? 'activo' : data.estado === 'pendiente' ? 'pendiente' : 'inactivo';
+    const badgeClass = cliente.estado === 'activo' ? 'activo' : cliente.estado === 'pendiente' ? 'pendiente' : 'inactivo';
 
     $('cliente-info').innerHTML = `
-      <h3>${data.nombre} ${data.apellido}</h3>
-      <div class="info-row"><span>Estado</span><span><span class="badge ${badgeClass}">${data.estado}</span></span></div>
-      <div class="info-row"><span>Distrito</span><span>${data.distrito}</span></div>
-      <div class="info-row"><span>Cajones</span><span>${data.cajones_asignados}</span></div>
+      <h3>${cliente.nombre} ${cliente.apellido}</h3>
+      <div class="info-row"><span>Estado</span><span><span class="badge ${badgeClass}">${cliente.estado}</span></span></div>
+      <div class="info-row"><span>Distrito</span><span>${cliente.distrito}</span></div>
+      <div class="info-row"><span>Cajones</span><span>${cliente.cajones_asignados}</span></div>
       <div class="info-row"><span>Último pedido</span><span>${diasSinPedido !== null ? `hace ${diasSinPedido} días` : 'Sin pedidos'}</span></div>
     `;
     $('form-venta').innerHTML = buildFormVenta('registrado');
