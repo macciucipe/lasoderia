@@ -8,267 +8,108 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --negro: #000000;
-  --amarillo: #ffc000;
-  --azul: #0000ff;
-  --blanco: #ffffff;
-  --gris: #111111;
-  --gris-medio: #1e1e1e;
-  --verde: #00cc44;
-  --rojo: #ff3333;
+  --negro: #000000; --amarillo: #ffc000; --azul: #0000ff;
+  --blanco: #ffffff; --gris: #111111; --gris-medio: #1e1e1e;
+  --verde: #00cc44; --rojo: #ff3333;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body {
-  background: var(--negro);
-  color: var(--blanco);
-  font-family: 'Barlow', sans-serif;
-  min-height: 100vh;
-}
+body { background: var(--negro); color: var(--blanco); font-family: 'Barlow', sans-serif; min-height: 100vh; }
 
-/* ─── NAV ─── */
-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 3rem; height: 64px;
-  background: var(--negro);
-  border-bottom: 2px solid var(--amarillo);
-}
-.nav-logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.6rem; color: var(--amarillo);
-  text-decoration: none; letter-spacing: 0.08em;
-}
+nav { display: flex; align-items: center; justify-content: space-between; padding: 0 3rem; height: 64px; background: var(--negro); border-bottom: 2px solid var(--amarillo); }
+.nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--amarillo); text-decoration: none; letter-spacing: 0.08em; }
 .nav-logo span { color: var(--azul); }
-.nav-back {
-  color: rgba(255,255,255,0.5); text-decoration: none;
-  font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
-  transition: color 0.2s;
-}
+.nav-back { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
 .nav-back:hover { color: var(--amarillo); }
 
-/* ─── LAYOUT ─── */
-.registro-wrap {
-  max-width: 680px; margin: 0 auto;
-  padding: 4rem 2rem 6rem;
-}
-.registro-header { margin-bottom: 3rem; }
-.registro-header p {
-  font-size: 0.75rem; font-weight: 700;
-  letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--azul); margin-bottom: 0.5rem;
-}
-.registro-header h1 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  line-height: 0.95; color: var(--blanco);
-}
-.registro-header h1 em { color: var(--amarillo); font-style: normal; }
+.wrap { max-width: 680px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+.hdr { margin-bottom: 3rem; }
+.hdr p { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--azul); margin-bottom: 0.5rem; }
+.hdr h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem,6vw,4rem); line-height: 0.95; color: var(--blanco); }
+.hdr h1 em { color: var(--amarillo); font-style: normal; }
 
-/* ─── PASOS ─── */
-.pasos-nav {
-  display: flex; gap: 0; margin-bottom: 3rem;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-.paso-tab {
-  flex: 1; padding: 0.75rem 0.5rem;
-  text-align: center; font-size: 0.72rem;
-  font-weight: 700; letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.25);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: color 0.2s, border-color 0.2s;
-}
-.paso-tab.activo {
-  color: var(--amarillo);
-  border-bottom-color: var(--amarillo);
-}
-.paso-tab.completado {
-  color: var(--verde);
-  border-bottom-color: var(--verde);
-}
-.paso-tab span {
-  display: block; font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.2rem; letter-spacing: 0.05em;
-  margin-bottom: 0.1rem;
-}
+.tabs { display: flex; margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.tab { flex:1; padding: 0.75rem 0.5rem; text-align:center; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.25); border-bottom:2px solid transparent; margin-bottom:-1px; }
+.tab span { display:block; font-family:'Bebas Neue',sans-serif; font-size:1.2rem; margin-bottom:0.1rem; }
+.tab.on { color:var(--amarillo); border-bottom-color:var(--amarillo); }
+.tab.done { color:var(--verde); border-bottom-color:var(--verde); }
 
-/* ─── PASOS CONTENIDO ─── */
-.paso-contenido { display: none; }
-.paso-contenido.activo { display: block; }
+.step { display:none; }
+.step.on { display:block; }
 
-/* ─── FORM ─── */
-.form-group { margin-bottom: 1.5rem; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-label {
-  display: block; font-size: 0.75rem; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(255,255,255,0.45); margin-bottom: 0.5rem;
+.fg { margin-bottom:1.5rem; }
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+label { display:block; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.45); margin-bottom:0.5rem; }
+input[type=text],input[type=tel],input[type=email],select,textarea {
+  width:100%; padding:0.85rem 1rem; background:var(--gris-medio);
+  border:1.5px solid rgba(255,255,255,0.1); color:var(--blanco);
+  font-family:'Barlow',sans-serif; font-size:0.95rem; outline:none;
+  transition:border-color 0.2s; appearance:none;
 }
-input, select, textarea {
-  width: 100%; padding: 0.85rem 1rem;
-  background: var(--gris-medio);
-  border: 1.5px solid rgba(255,255,255,0.1);
-  color: var(--blanco);
-  font-family: 'Barlow', sans-serif; font-size: 0.95rem;
-  outline: none; transition: border-color 0.2s;
-  appearance: none;
-}
-input:focus, select:focus, textarea:focus {
-  border-color: var(--amarillo);
-}
-input.error, select.error { border-color: var(--rojo); }
-input.ok { border-color: var(--verde); }
-select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ffffff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  padding-right: 2.5rem;
-  background-color: var(--gris-medio);
-}
-select option { background: var(--gris); }
-.field-error {
-  font-size: 0.78rem; color: var(--rojo);
-  margin-top: 0.4rem; display: none;
-}
-.field-error.visible { display: block; }
-textarea { resize: vertical; min-height: 90px; }
+input:focus,select:focus,textarea:focus { border-color:var(--amarillo); }
+input.err,select.err { border-color:var(--rojo); }
+input.ok { border-color:var(--verde); }
+select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23fff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 1rem center; padding-right:2.5rem; background-color:var(--gris-medio); }
+select option { background:var(--gris); }
+.ferr { font-size:0.78rem; color:var(--rojo); margin-top:0.4rem; display:none; }
+.ferr.on { display:block; }
+textarea { resize:vertical; min-height:90px; }
 
-/* ─── DIRECCIÓN EXTRA ─── */
-.add-dir-btn {
-  background: none; border: 1px dashed rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.4); padding: 0.6rem 1rem;
-  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
-  cursor: pointer; width: 100%; transition: all 0.2s;
-  font-family: 'Barlow', sans-serif;
-}
-.add-dir-btn:hover { border-color: var(--amarillo); color: var(--amarillo); }
+.dsp { padding:0.85rem 1rem; background:var(--gris-medio); border:1.5px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.35); font-size:0.95rem; font-family:'Barlow',sans-serif; transition:border-color 0.3s,color 0.3s; }
+.dsp.ok { color:var(--verde); border-color:var(--verde); }
+.dsp.err { color:var(--rojo); border-color:var(--rojo); }
 
-/* ─── TYC ─── */
-.tyc-box {
-  background: var(--gris-medio);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 1.5rem; max-height: 220px;
-  overflow-y: auto; margin-bottom: 1.5rem;
-  font-size: 0.83rem; color: rgba(255,255,255,0.55);
-  line-height: 1.7;
-}
-.tyc-box h4 {
-  color: var(--blanco); font-size: 0.88rem;
-  margin-bottom: 0.75rem; font-weight: 700;
-}
-.tyc-box p { margin-bottom: 0.75rem; }
-.tyc-box::-webkit-scrollbar { width: 3px; }
-.tyc-box::-webkit-scrollbar-thumb { background: var(--amarillo); }
-.check-row {
-  display: flex; gap: 0.75rem; align-items: flex-start;
-  margin-bottom: 1rem; cursor: pointer;
-}
-.check-row input[type="checkbox"] {
-  width: 18px; height: 18px; min-width: 18px;
-  accent-color: var(--amarillo); cursor: pointer;
-  margin-top: 2px;
-}
-.check-row span { font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.5; }
-.check-row a { color: var(--amarillo); }
+.map-box { width:100%; height:240px; margin-top:0.75rem; border:1.5px solid rgba(255,192,0,0.3); display:none; }
 
-/* ─── SEÑA INFO ─── */
-.sena-info {
-  background: rgba(255,192,0,0.06);
-  border: 1px solid rgba(255,192,0,0.2);
-  border-left: 4px solid var(--amarillo);
-  padding: 1.5rem; margin-bottom: 2rem;
-}
-.sena-info h4 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1rem; font-weight: 900;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--amarillo); margin-bottom: 0.75rem;
-}
-.sena-info p { font-size: 0.85rem; color: rgba(255,255,255,0.65); line-height: 1.65; }
-.sena-monto {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2.5rem; color: var(--amarillo);
-  display: block; margin: 0.5rem 0;
-}
-.transferencia-datos {
-  background: var(--gris-medio);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 1.2rem 1.5rem; margin: 1rem 0;
-}
-.transferencia-datos p {
-  font-size: 0.85rem; color: rgba(255,255,255,0.6);
-  margin-bottom: 0.4rem;
-}
-.transferencia-datos strong { color: var(--blanco); }
+.add-btn { background:none; border:1px dashed rgba(255,255,255,0.2); color:rgba(255,255,255,0.4); padding:0.6rem 1rem; font-size:0.8rem; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; width:100%; transition:all 0.2s; font-family:'Barlow',sans-serif; margin-top:1rem; }
+.add-btn:hover { border-color:var(--amarillo); color:var(--amarillo); }
 
-/* ─── BOTONES ─── */
-.btn-siguiente {
-  background: var(--amarillo); color: var(--negro);
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1rem; font-weight: 900;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  padding: 1rem 2.5rem; border: none; cursor: pointer;
-  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
-  transition: background 0.15s, transform 0.15s;
-  display: inline-block;
-}
-.btn-siguiente:hover { background: var(--blanco); transform: translateY(-1px); }
-.btn-siguiente:disabled { background: rgba(255,192,0,0.3); color: rgba(0,0,0,0.4); cursor: not-allowed; transform: none; }
-.btn-anterior {
-  background: transparent; color: rgba(255,255,255,0.4);
-  font-family: 'Barlow', sans-serif; font-size: 0.85rem;
-  border: none; cursor: pointer; padding: 1rem 1.5rem;
-  transition: color 0.2s;
-}
-.btn-anterior:hover { color: var(--blanco); }
-.btn-row { display: flex; align-items: center; gap: 1rem; margin-top: 2rem; }
+.tyc-box { background:var(--gris-medio); border:1px solid rgba(255,255,255,0.08); padding:1.5rem; max-height:240px; overflow-y:auto; margin-bottom:1.5rem; font-size:0.83rem; color:rgba(255,255,255,0.55); line-height:1.7; }
+.tyc-box h4 { color:var(--blanco); font-size:0.88rem; margin-bottom:0.75rem; font-weight:700; }
+.tyc-box p { margin-bottom:0.75rem; }
+.tyc-box::-webkit-scrollbar { width:3px; }
+.tyc-box::-webkit-scrollbar-thumb { background:var(--amarillo); }
+.chk { display:flex; gap:0.75rem; align-items:flex-start; margin-bottom:1rem; cursor:pointer; }
+.chk input[type=checkbox] { width:20px; height:20px; min-width:20px; accent-color:var(--amarillo); cursor:pointer; margin-top:2px; }
+.chk span { font-size:0.88rem; color:rgba(255,255,255,0.7); line-height:1.55; }
+.chk a { color:var(--amarillo); }
 
-/* ─── ÉXITO ─── */
-#paso-exito {
-  text-align: center; padding: 3rem 0;
-}
-.exito-icono {
-  width: 80px; height: 80px;
-  background: var(--verde); margin: 0 auto 2rem;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.5rem;
-  clip-path: polygon(15px 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%);
-}
-#paso-exito h2 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 3rem; color: var(--blanco); margin-bottom: 1rem;
-}
-#paso-exito h2 em { color: var(--amarillo); font-style: normal; }
-#paso-exito p { color: rgba(255,255,255,0.55); line-height: 1.7; max-width: 480px; margin: 0 auto 1rem; }
+.sbox { background:rgba(255,192,0,0.06); border:1px solid rgba(255,192,0,0.2); border-left:4px solid var(--amarillo); padding:1.5rem; margin-bottom:2rem; }
+.sbox h4 { font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:var(--amarillo); margin-bottom:0.75rem; }
+.sbox p { font-size:0.85rem; color:rgba(255,255,255,0.65); line-height:1.65; }
+.smonto { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; color:var(--amarillo); display:block; margin:0.5rem 0; }
+.tdata { background:var(--gris-medio); border:1px solid rgba(255,255,255,0.08); padding:1.2rem 1.5rem; margin:1rem 0; }
+.tdata p { font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:0.4rem; }
+.tdata strong { color:var(--blanco); }
 
-/* ─── SEPARADOR ─── */
-.sep {
-  border: none; border-top: 1px solid rgba(255,255,255,0.06);
-  margin: 2rem 0;
-}
+.btn-s { background:var(--amarillo); color:var(--negro); font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:900; letter-spacing:0.12em; text-transform:uppercase; padding:1rem 2.5rem; border:none; cursor:pointer; clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%); transition:background 0.15s; }
+.btn-s:hover { background:var(--blanco); }
+.btn-a { background:transparent; color:rgba(255,255,255,0.4); font-family:'Barlow',sans-serif; font-size:0.85rem; border:none; cursor:pointer; padding:1rem 1.5rem; transition:color 0.2s; }
+.btn-a:hover { color:var(--blanco); }
+.btnrow { display:flex; align-items:center; gap:1rem; margin-top:2rem; }
+.sep { border:none; border-top:1px solid rgba(255,255,255,0.06); margin:2rem 0; }
 
-/* ─── LOADING ─── */
-.loading {
-  display: none; align-items: center; gap: 0.75rem;
-  color: rgba(255,255,255,0.5); font-size: 0.85rem;
-}
-.loading.visible { display: flex; }
-.spinner {
-  width: 18px; height: 18px;
-  border: 2px solid rgba(255,255,255,0.1);
-  border-top-color: var(--amarillo);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+.spin-wrap { display:none; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.5); font-size:0.85rem; }
+.spin-wrap.on { display:flex; }
+.spin { width:18px; height:18px; border:2px solid rgba(255,255,255,0.1); border-top-color:var(--amarillo); border-radius:50%; animation:rot 0.7s linear infinite; }
+@keyframes rot { to { transform:rotate(360deg); } }
 
-@media (max-width: 600px) {
-  nav { padding: 0 1rem; }
-  .registro-wrap { padding: 2rem 1rem 4rem; }
-  .form-row { grid-template-columns: 1fr; }
-  .pasos-nav { overflow-x: auto; }
-  .paso-tab { min-width: 80px; }
+.exito { text-align:center; padding:3rem 0; display:none; }
+.exito-ico { width:80px; height:80px; background:var(--verde); margin:0 auto 2rem; display:flex; align-items:center; justify-content:center; font-size:2.5rem; clip-path:polygon(15px 0%,100% 0%,calc(100% - 15px) 100%,0% 100%); }
+.exito h2 { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--blanco); margin-bottom:1rem; }
+.exito h2 em { color:var(--amarillo); font-style:normal; }
+.exito p { color:rgba(255,255,255,0.55); line-height:1.7; max-width:480px; margin:0 auto 1rem; }
+
+.pac-container { background:var(--gris); border:1px solid var(--amarillo); font-family:'Barlow',sans-serif; z-index:9999; }
+.pac-item { color:var(--blanco); border-top:1px solid rgba(255,255,255,0.06); padding:0.5rem 1rem; cursor:pointer; }
+.pac-item:hover,.pac-item-selected { background:var(--gris-medio); }
+.pac-item-query { color:var(--amarillo); }
+.pac-matched { color:var(--amarillo); }
+
+@media(max-width:600px){
+  nav{padding:0 1rem;}
+  .wrap{padding:2rem 1rem 4rem;}
+  .row2{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -279,462 +120,302 @@ textarea { resize: vertical; min-height: 90px; }
   <a href="index.html" class="nav-back">← Volver al inicio</a>
 </nav>
 
-<div class="registro-wrap">
-
-  <div class="registro-header">
+<div class="wrap">
+  <div class="hdr">
     <p>Nuevo cliente</p>
     <h1>REGISTRATE<br>EN <em>LA SODERÍA</em></h1>
   </div>
 
-  <!-- INDICADOR DE PASOS -->
-  <div class="pasos-nav">
-    <div class="paso-tab activo" id="tab-1"><span>01</span>Tus datos</div>
-    <div class="paso-tab" id="tab-2"><span>02</span>Dirección</div>
-    <div class="paso-tab" id="tab-3"><span>03</span>Términos</div>
-    <div class="paso-tab" id="tab-4"><span>04</span>La seña</div>
+  <div class="tabs">
+    <div class="tab on" id="tab-1"><span>01</span>Tus datos</div>
+    <div class="tab" id="tab-2"><span>02</span>Dirección</div>
+    <div class="tab" id="tab-3"><span>03</span>Términos</div>
+    <div class="tab" id="tab-4"><span>04</span>La seña</div>
   </div>
 
-  <!-- ══════════════════════════════════ -->
-  <!-- PASO 1 — DATOS PERSONALES         -->
-  <!-- ══════════════════════════════════ -->
-  <div class="paso-contenido activo" id="paso-1">
-    <div class="form-row">
-      <div class="form-group">
-        <label>Nombre *</label>
-        <input type="text" id="nombre" placeholder="Juan">
-        <div class="field-error" id="err-nombre">Ingresá tu nombre</div>
-      </div>
-      <div class="form-group">
-        <label>Apellido *</label>
-        <input type="text" id="apellido" placeholder="García">
-        <div class="field-error" id="err-apellido">Ingresá tu apellido</div>
-      </div>
+  <!-- PASO 1 -->
+  <div class="step on" id="paso-1">
+    <div class="row2">
+      <div class="fg"><label>Nombre *</label><input type="text" id="nombre" placeholder="Juan"><div class="ferr" id="e-nombre">Ingresá tu nombre</div></div>
+      <div class="fg"><label>Apellido *</label><input type="text" id="apellido" placeholder="García"><div class="ferr" id="e-apellido">Ingresá tu apellido</div></div>
     </div>
-    <div class="form-group">
+    <div class="fg">
       <label>Tipo de documento *</label>
-      <select id="tipo-doc" onchange="actualizarCampoDni()">
+      <select id="tipo-doc" onchange="cambiarDoc()">
         <option value="DNI">DNI — Documento Nacional de Identidad</option>
         <option value="CE">CE — Carné de Extranjería</option>
       </select>
     </div>
-    <div class="form-group">
-      <label id="label-dni">Número de DNI *</label>
+    <div class="fg">
+      <label id="lbl-doc">Número de DNI *</label>
       <input type="text" id="dni" inputmode="numeric" placeholder="12345678" maxlength="8">
-      <div class="field-error" id="err-dni">Ingresá un DNI válido (8 dígitos)</div>
+      <div class="ferr" id="e-dni">DNI debe tener 8 dígitos</div>
     </div>
-    <div class="form-group">
-      <label>WhatsApp / Teléfono *</label>
-      <input type="tel" id="telefono" placeholder="+51 999 999 999">
-      <div class="field-error" id="err-telefono">Ingresá tu número de WhatsApp</div>
-    </div>
-    <div class="form-group">
-      <label>Correo electrónico *</label>
-      <input type="email" id="email" placeholder="juan@correo.com">
-      <div class="field-error" id="err-email">Ingresá un correo válido</div>
-    </div>
-    <div class="btn-row">
-      <button class="btn-siguiente" onclick="irPaso(2)">Siguiente →</button>
-    </div>
+    <div class="fg"><label>WhatsApp *</label><input type="tel" id="tel" placeholder="+51 999 999 999"><div class="ferr" id="e-tel">Ingresá tu número</div></div>
+    <div class="fg"><label>Correo electrónico *</label><input type="email" id="email" placeholder="juan@correo.com"><div class="ferr" id="e-email">Ingresá un correo válido</div></div>
+    <div class="btnrow"><button class="btn-s" onclick="ir(2)">Siguiente →</button></div>
   </div>
 
-  <!-- ══════════════════════════════════ -->
-  <!-- PASO 2 — DIRECCIÓN                -->
-  <!-- ══════════════════════════════════ -->
-  <div class="paso-contenido" id="paso-2">
-    <div class="form-group">
-      <label id="label-distrito">Distrito</label>
-      <div id="distrito-display" style="padding:0.85rem 1rem;background:var(--gris-medio);border:1.5px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.35);font-size:0.95rem;">
-        Se completa automáticamente con la dirección
-      </div>
+  <!-- PASO 2 -->
+  <div class="step" id="paso-2">
+    <div class="fg">
+      <label>Distrito</label>
+      <div class="dsp" id="dsp-distrito">Se completa automáticamente con la dirección</div>
       <input type="hidden" id="distrito">
-      <div class="field-error" id="err-distrito">La dirección ingresada no está en nuestra zona de cobertura</div>
+      <div class="ferr" id="e-distrito">Esta zona no está en nuestra cobertura aún</div>
     </div>
-    <div class="form-group">
+    <div class="fg">
       <label>Dirección principal *</label>
-      <input type="text" id="direccion1" placeholder="Escribí tu dirección…" autocomplete="off">
-      <div class="field-error" id="err-direccion1">Ingresá tu dirección</div>
+      <input type="text" id="dir1" placeholder="Escribí tu calle y número…" autocomplete="off">
+      <div class="ferr" id="e-dir1">Seleccioná una dirección del listado de Google</div>
     </div>
-    <input type="hidden" id="lat1">
-    <input type="hidden" id="lng1">
+    <div class="fg" id="g-dpto1" style="display:none">
+      <label>Piso / Departamento / Referencia</label>
+      <input type="text" id="dpto1" placeholder="Ej: Dpto 4B · Piso 3 · Casa del fondo">
+    </div>
+    <div class="map-box" id="map1"></div>
+    <input type="hidden" id="lat1"><input type="hidden" id="lng1">
 
-    <div class="form-group" id="grupo-dir2" style="display:none;margin-top:1.5rem">
-      <label>Segunda dirección (opcional)</label>
-      <input type="text" id="direccion2" placeholder="Escribí otra dirección…" autocomplete="off">
-      <input type="hidden" id="lat2">
-      <input type="hidden" id="lng2">
+    <div id="g-dir2" style="display:none; margin-top:2rem; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,0.06)">
+      <div class="fg"><label>Segunda dirección (opcional)</label><input type="text" id="dir2" placeholder="Otra dirección de entrega…" autocomplete="off"></div>
+      <div class="fg"><label>Piso / Departamento / Referencia</label><input type="text" id="dpto2" placeholder="Ej: Dpto 4B · Piso 3…"></div>
+      <div class="map-box" id="map2"></div>
+      <input type="hidden" id="lat2"><input type="hidden" id="lng2">
     </div>
-    <button class="add-dir-btn" onclick="toggleDir2()" id="btn-add-dir" style="margin-top:1rem">
-      + Agregar segunda dirección de entrega
-    </button>
-    <div class="btn-row">
-      <button class="btn-anterior" onclick="irPaso(1)">← Anterior</button>
-      <button class="btn-siguiente" onclick="irPaso(3)">Siguiente →</button>
+
+    <button class="add-btn" onclick="toggle2()" id="btn-dir2">+ Agregar segunda dirección</button>
+    <div class="btnrow">
+      <button class="btn-a" onclick="ir(1)">← Anterior</button>
+      <button class="btn-s" onclick="ir(3)">Siguiente →</button>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════ -->
-  <!-- PASO 3 — TÉRMINOS Y CONDICIONES   -->
-  <!-- ══════════════════════════════════ -->
-  <div class="paso-contenido" id="paso-3">
+  <!-- PASO 3 -->
+  <div class="step" id="paso-3">
     <div class="tyc-box">
       <h4>Términos y Condiciones — La Sodería ATR</h4>
-
-      <p><strong>1. El servicio</strong><br>
-      La Sodería ATR provee soda carbonatada en sifones retornables a domicilio en Lima Metropolitana. El cliente no adquiere los sifones ni los cajones en propiedad — los recibe en préstamo bajo depósito (seña).</p>
-
-      <p><strong>2. La seña (depósito)</strong><br>
-      Al activar su cuenta, el cliente abona una seña de S/ 5 por cada sifón y S/ 20 por cada cajón, resultando en S/ 50 por cajón completo. Esta seña es un depósito en garantía y será devuelta íntegramente al momento de la devolución de los equipos en buen estado.</p>
-
-      <p><strong>3. Costo real del equipo</strong><br>
-      El valor real de cada sifón es de USD 20 y el cajón es de USD 80, totalizando USD 200 por cajón. La seña no cubre la totalidad de este valor. En caso de no devolución o pérdida de equipos, el cliente deberá abonar la diferencia entre la seña pagada y el costo real del equipo, según el tipo de cambio vigente al momento del incidente.</p>
-
-      <p><strong>4. Regla de inactividad</strong><br>
-      Si el cliente no realiza ningún pedido de recarga durante 45 días corridos, La Sodería ATR se comunicará para coordinar la devolución de los equipos. Una vez devueltos en buen estado, la seña será reintegrada en un plazo máximo de 7 días hábiles.</p>
-
-      <p><strong>5. Pedidos y entregas</strong><br>
-      Los pedidos se realizan exclusivamente a través del número de WhatsApp registrado en la cuenta. El cobro de cada recarga es realizado por el repartidor asignado al momento de la entrega, en efectivo.</p>
-
-      <p><strong>6. Cantidad máxima de cajones</strong><br>
-      Sin autorización especial, cada cliente puede tener hasta 2 cajones en su poder de forma simultánea.</p>
-
-      <p><strong>7. Cancelación del servicio</strong><br>
-      El cliente puede cancelar el servicio en cualquier momento con 7 días de anticipación, coordinando la devolución de equipos y la restitución de la seña.</p>
-
-      <p><strong>8. Protección de datos personales</strong><br>
-      Los datos personales proporcionados durante el registro (nombre, DNI, teléfono, correo, dirección) son recopilados exclusivamente para la prestación del servicio y la verificación de identidad, en cumplimiento con la Ley N° 29733 — Ley de Protección de Datos Personales del Perú. En ningún caso serán utilizados con fines de marketing, ni compartidos con terceros sin consentimiento expreso del titular. El cliente tiene derecho a solicitar la actualización, corrección o eliminación de sus datos en cualquier momento.</p>
+      <p><strong>1. El servicio</strong><br>La Sodería ATR provee soda carbonatada en sifones retornables a domicilio en Lima Metropolitana. El cliente no adquiere los sifones ni los cajones en propiedad — los recibe en préstamo bajo depósito (seña).</p>
+      <p><strong>2. La seña (depósito)</strong><br>Al activar su cuenta, el cliente abona una seña de S/ 5 por cada sifón y S/ 20 por cada cajón, resultando en S/ 50 por cajón completo. Esta seña es un depósito en garantía y será devuelta íntegramente al momento de la devolución de los equipos en buen estado.</p>
+      <p><strong>3. Costo real del equipo</strong><br>El valor real de cada sifón es de USD 20 y el cajón USD 80, totalizando USD 200 por cajón. En caso de no devolución, el cliente deberá abonar la diferencia entre la seña y el costo real según el tipo de cambio vigente.</p>
+      <p><strong>4. Regla de inactividad</strong><br>Si el cliente no realiza ningún pedido durante 45 días corridos, La Sodería ATR coordinará la devolución de los equipos y reintegrará la seña en un plazo máximo de 7 días hábiles.</p>
+      <p><strong>5. Pedidos y entregas</strong><br>Los pedidos se realizan por WhatsApp desde el número registrado. El cobro de cada recarga lo realiza el repartidor en efectivo al momento de la entrega.</p>
+      <p><strong>6. Cantidad máxima</strong><br>Sin autorización especial, cada cliente puede tener hasta 2 cajones simultáneamente.</p>
+      <p><strong>7. Cancelación</strong><br>El cliente puede cancelar con 7 días de anticipación, coordinando la devolución y restitución de la seña.</p>
+      <p><strong>8. Protección de datos</strong><br>Los datos son recopilados exclusivamente para la prestación del servicio, en cumplimiento con la Ley N° 29733. No serán utilizados con fines de marketing ni compartidos con terceros sin consentimiento expreso.</p>
     </div>
 
-    <label class="check-row">
-      <input type="checkbox" id="check-tyc">
-      <span>He leído y acepto los <a href="#">Términos y Condiciones</a>, incluyendo las condiciones sobre la seña, el costo real del equipo y la regla de los 45 días de inactividad.</span>
-    </label>
+    <div class="ferr on" id="e-tyc" style="display:none">Debés aceptar ambas casillas para continuar.</div>
 
-    <label class="check-row">
-      <input type="checkbox" id="check-datos">
-      <span>Acepto el tratamiento de mis datos personales conforme a la Ley N° 29733 y confirmo que la información proporcionada es verídica.</span>
-    </label>
+    <label class="chk"><input type="checkbox" id="chk-tyc"><span>He leído y acepto los <a href="#">Términos y Condiciones</a>, incluyendo la seña, el costo real del equipo y la regla de los 45 días.</span></label>
+    <label class="chk"><input type="checkbox" id="chk-datos"><span>Acepto el tratamiento de mis datos personales conforme a la Ley N° 29733 y confirmo que la información es verídica.</span></label>
 
-    <div class="btn-row">
-      <button class="btn-anterior" onclick="irPaso(2)">← Anterior</button>
-      <button class="btn-siguiente" onclick="irPaso(4)">Siguiente →</button>
+    <div class="btnrow">
+      <button class="btn-a" onclick="ir(2)">← Anterior</button>
+      <button class="btn-s" onclick="ir(4)">Siguiente →</button>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════ -->
-  <!-- PASO 4 — LA SEÑA                  -->
-  <!-- ══════════════════════════════════ -->
-  <div class="paso-contenido" id="paso-4">
-    <div class="sena-info">
-      <h4>¿Cuántos cajones querés?</h4>
-      <p>Cada cajón incluye 6 sifones. Podés tener hasta 2 cajones sin autorización especial.</p>
-    </div>
-
-    <div class="form-group">
+  <!-- PASO 4 -->
+  <div class="step" id="paso-4">
+    <div class="sbox"><h4>¿Cuántos cajones querés?</h4><p>Cada cajón trae 6 sifones. Podés tener hasta 2 sin autorización especial.</p></div>
+    <div class="fg">
       <label>Cantidad de cajones *</label>
-      <select id="cajones" onchange="calcularSena()">
+      <select id="cajones" onchange="calcSena()">
         <option value="1">1 cajón — 6 sifones</option>
         <option value="2">2 cajones — 12 sifones</option>
       </select>
     </div>
-
-    <div class="sena-info">
-      <h4>Total a depositar</h4>
-      <span class="sena-monto" id="monto-sena">S/ 50</span>
-      <p id="detalle-sena">1 cajón × S/50 = S/50 de seña</p>
-    </div>
-
+    <div class="sbox"><h4>Total a depositar</h4><span class="smonto" id="monto">S/ 50</span><p id="detalle">1 cajón × S/50 = S/50</p></div>
     <hr class="sep">
-
-    <div class="sena-info">
+    <div class="sbox">
       <h4>Datos para la transferencia</h4>
-      <p>Realizá la transferencia y adjuntá el comprobante. Verificamos el pago y activamos tu cuenta en menos de 24 horas.</p>
-      <div class="transferencia-datos">
+      <p>Realizá la transferencia y anotá el número de operación. Activamos tu cuenta en menos de 24 horas.</p>
+      <div class="tdata">
         <p><strong>Banco:</strong> BCP</p>
         <p><strong>Titular:</strong> La Sodería ATR S.A.C.</p>
         <p><strong>Cuenta corriente:</strong> 000-0000000-0-00</p>
         <p><strong>CCI:</strong> 00000000000000000000</p>
         <p><strong>Yape:</strong> +51 999 000 000</p>
       </div>
-      <p style="margin-top:0.5rem">⚠️ En el concepto de la transferencia escribí tu <strong>DNI</strong>.</p>
+      <p style="margin-top:0.5rem">⚠️ En el concepto escribí tu <strong>DNI o CE</strong>.</p>
     </div>
-
-    <div class="form-group">
-      <label>Número de operación / comprobante *</label>
-      <input type="text" id="comprobante" placeholder="Ej: 123456789">
-      <div class="field-error" id="err-comprobante">Ingresá el número de operación</div>
-    </div>
-
-    <div class="form-group">
-      <label>Notas adicionales (opcional)</label>
-      <textarea id="notas" placeholder="Referencia de dirección, portero, horario preferido…"></textarea>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn-anterior" onclick="irPaso(3)">← Anterior</button>
-      <button class="btn-siguiente" id="btn-enviar" onclick="enviarRegistro()">Confirmar registro →</button>
-      <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <span>Guardando tu registro…</span>
-      </div>
+    <div class="fg"><label>Número de operación *</label><input type="text" id="comprobante" placeholder="Ej: 123456789"><div class="ferr" id="e-comp">Ingresá el número de operación</div></div>
+    <div class="fg"><label>Notas adicionales (opcional)</label><textarea id="notas" placeholder="Referencia de dirección, portero, horario preferido…"></textarea></div>
+    <div class="btnrow">
+      <button class="btn-a" onclick="ir(3)">← Anterior</button>
+      <button class="btn-s" id="btn-env" onclick="enviar()">Confirmar registro →</button>
+      <div class="spin-wrap" id="spin"><div class="spin"></div><span>Guardando…</span></div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════ -->
-  <!-- ÉXITO                             -->
-  <!-- ══════════════════════════════════ -->
-  <div id="paso-exito" style="display:none">
-    <div class="exito-icono">✓</div>
+  <!-- ÉXITO -->
+  <div class="exito" id="exito">
+    <div class="exito-ico">✓</div>
     <h2>¡REGISTRO<br><em>RECIBIDO!</em></h2>
-    <p>Recibimos tu solicitud y el comprobante de pago. En menos de 24 horas verificamos la transferencia y activamos tu cuenta.</p>
-    <p>Te vamos a escribir al WhatsApp que registraste para confirmarte todo.</p>
-    <br>
-    <a href="index.html" class="btn-siguiente" style="text-decoration:none">← Volver al inicio</a>
+    <p>Recibimos tu solicitud y el comprobante. En menos de 24 horas verificamos el pago y activamos tu cuenta.</p>
+    <p>Te escribimos al WhatsApp registrado para confirmarte todo.</p>
+    <br><a href="index.html" class="btn-s" style="text-decoration:none">← Volver al inicio</a>
   </div>
-
 </div>
 
-<!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://rnyevcqqsjharrncswpl.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_LRKrU-Pjchfp7Y1PqBRxWg_11BekgEF';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = supabase.createClient('https://rnyevcqqsjharrncswpl.supabase.co','sb_publishable_LRKrU-Pjchfp7Y1PqBRxWg_11BekgEF');
+let paso = 1, dir1OK = false;
+const ZONAS = ['miraflores','san isidro','barranco','santiago de surco','surco','la molina','san borja','jesús maría','jesus maria','lince','pueblo libre','magdalena del mar','magdalena','san miguel','chorrillos'];
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 
-let pasoActual = 1;
-
-// ── Tipo de documento ──
-function actualizarCampoDni() {
-  const tipo = document.getElementById('tipo-doc').value;
-  const label = document.getElementById('label-dni');
-  const input = document.getElementById('dni');
-  const err = document.getElementById('err-dni');
-
-  if (tipo === 'DNI') {
-    label.textContent = 'Número de DNI *';
-    input.placeholder = '12345678';
-    input.maxLength = 8;
-    err.textContent = 'Ingresá un DNI válido (8 dígitos)';
-  } else {
-    label.textContent = 'Número de Carné de Extranjería *';
-    input.placeholder = '001234567';
-    input.maxLength = 9;
-    err.textContent = 'Ingresá un CE válido (9 dígitos)';
-  }
-  input.value = '';
-  input.classList.remove('error', 'ok');
+function cambiarDoc() {
+  const t = $('tipo-doc').value;
+  $('lbl-doc').textContent = t==='DNI' ? 'Número de DNI *' : 'Número de CE *';
+  $('dni').placeholder = t==='DNI' ? '12345678' : '001234567';
+  $('dni').maxLength = t==='DNI' ? 8 : 9;
+  $('e-dni').textContent = t==='DNI' ? 'DNI debe tener 8 dígitos' : 'CE debe tener 9 dígitos';
+  $('dni').value = '';
+  $('dni').className = '';
 }
 
-// ── Navegación entre pasos ──
-function irPaso(n) {
-  if (n > pasoActual && !validarPaso(pasoActual)) return;
-
-  document.getElementById(`paso-${pasoActual}`).classList.remove('activo');
-  document.getElementById(`tab-${pasoActual}`).classList.remove('activo');
-  document.getElementById(`tab-${pasoActual}`).classList.add('completado');
-
-  pasoActual = n;
-  document.getElementById(`paso-${n}`).classList.add('activo');
-  document.getElementById(`tab-${n}`).classList.remove('completado');
-  document.getElementById(`tab-${n}`).classList.add('activo');
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// ── Validación por paso ──
-function validarPaso(n) {
-  let ok = true;
-
-  if (n === 1) {
-    ok = validarCampo('nombre', v => v.length >= 2, 'err-nombre') && ok;
-    ok = validarCampo('apellido', v => v.length >= 2, 'err-apellido') && ok;
-    const tipo = document.getElementById('tipo-doc').value;
-    const dniValidator = tipo === 'DNI'
-      ? v => /^\d{8}$/.test(v)
-      : v => /^\d{9}$/.test(v);
-    const dniMsg = tipo === 'DNI'
-      ? 'Ingresá un DNI válido (8 dígitos)'
-      : 'Ingresá un CE válido (9 dígitos)';
-    document.getElementById('err-dni').textContent = dniMsg;
-    ok = validarCampo('dni', dniValidator, 'err-dni') && ok;
-    ok = validarCampo('telefono', v => v.length >= 7, 'err-telefono') && ok;
-    ok = validarCampo('email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), 'err-email') && ok;
-  }
-
-  if (n === 2) {
-    ok = validarCampo('distrito', v => v !== '', 'err-distrito') && ok;
-    ok = validarCampo('direccion1', v => v.length >= 5, 'err-direccion1') && ok;
-  }
-
-  if (n === 3) {
-    const tyc = document.getElementById('check-tyc').checked;
-    const datos = document.getElementById('check-datos').checked;
-    if (!tyc || !datos) {
-      alert('Debés aceptar los términos y condiciones para continuar.');
-      return false;
-    }
-  }
-
+function $(id){ return document.getElementById(id); }
+function v(id, fn, eid) {
+  const val = $(id).value.trim(), ok = fn(val);
+  $(id).classList.toggle('err',!ok); $(id).classList.toggle('ok',ok);
+  $(eid).classList.toggle('on',!ok);
   return ok;
 }
 
-function validarCampo(id, fn, errId) {
-  const val = document.getElementById(id).value.trim();
-  const ok = fn(val);
-  document.getElementById(id).classList.toggle('error', !ok);
-  document.getElementById(id).classList.toggle('ok', ok);
-  document.getElementById(errId).classList.toggle('visible', !ok);
-  return ok;
+function ir(n) {
+  if (n > paso && !validar(paso)) return;
+  $(`paso-${paso}`).classList.remove('on'); $(`tab-${paso}`).classList.remove('on'); $(`tab-${paso}`).classList.add('done');
+  paso = n;
+  $(`paso-${n}`).classList.add('on'); $(`tab-${n}`).classList.remove('done'); $(`tab-${n}`).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ── Segunda dirección ──
-function toggleDir2() {
-  const grupo = document.getElementById('grupo-dir2');
-  const btn = document.getElementById('btn-add-dir');
-  const visible = grupo.style.display !== 'none';
-  grupo.style.display = visible ? 'none' : 'block';
-  btn.textContent = visible ? '+ Agregar segunda dirección de entrega' : '− Quitar segunda dirección';
-}
-
-// ── Calcular seña ──
-function calcularSena() {
-  const cajones = parseInt(document.getElementById('cajones').value);
-  const total = cajones * 50;
-  document.getElementById('monto-sena').textContent = `S/ ${total}`;
-  document.getElementById('detalle-sena').textContent =
-    `${cajones} cajón${cajones > 1 ? 'es' : ''} × S/50 = S/${total} de seña`;
-}
-
-// ── Enviar registro a Supabase ──
-async function enviarRegistro() {
-  if (!validarCampo('comprobante', v => v.length >= 3, 'err-comprobante')) return;
-
-  const btn = document.getElementById('btn-enviar');
-  const loading = document.getElementById('loading');
-  btn.style.display = 'none';
-  loading.classList.add('visible');
-
-  const data = {
-    nombre: document.getElementById('nombre').value.trim(),
-    apellido: document.getElementById('apellido').value.trim(),
-    dni: `${document.getElementById('tipo-doc').value}: ${document.getElementById('dni').value.trim()}`,
-    telefono: document.getElementById('telefono').value.trim(),
-    email: document.getElementById('email').value.trim(),
-    direccion_1: document.getElementById('direccion1').value.trim(),
-    direccion_2: document.getElementById('direccion2').value.trim() || null,
-    distrito: document.getElementById('distrito').value,
-    latitud: parseFloat(document.getElementById('lat1').value) || null,
-    longitud: parseFloat(document.getElementById('lng1').value) || null,
-    cajones_asignados: parseInt(document.getElementById('cajones').value),
-    estado: 'pendiente',
-    sena_pagada: false,
-    notas: `Comprobante: ${document.getElementById('comprobante').value.trim()}. ${document.getElementById('notas').value.trim()}`
-  };
-
-  try {
-    const { error } = await sb.from('clientes').insert([data]);
-
-    if (error) throw error;
-
-    // Éxito
-    document.getElementById('paso-4').classList.remove('activo');
-    document.querySelectorAll('.pasos-nav').forEach(el => el.style.display = 'none');
-    document.getElementById('paso-exito').style.display = 'block';
-
-  } catch (err) {
-    loading.classList.remove('visible');
-    btn.style.display = 'inline-block';
-
-    if (err.message && err.message.includes('duplicate')) {
-      alert('Ya existe una cuenta con ese DNI, teléfono o email. Si ya estás registrado, escribinos por WhatsApp.');
-    } else {
-      alert('Hubo un problema al guardar tu registro. Por favor intentá de nuevo o escribinos por WhatsApp.');
-    }
-    console.error(err);
+function validar(n) {
+  if (n===1) {
+    let ok = true;
+    ok = v('nombre', s=>s.length>=2,'e-nombre') && ok;
+    ok = v('apellido', s=>s.length>=2,'e-apellido') && ok;
+    const t = $('tipo-doc').value;
+    $('e-dni').textContent = t==='DNI'?'DNI debe tener 8 dígitos':'CE debe tener 9 dígitos';
+    ok = v('dni', s=>t==='DNI'?/^\d{8}$/.test(s):/^\d{9}$/.test(s),'e-dni') && ok;
+    ok = v('tel', s=>s.length>=7,'e-tel') && ok;
+    ok = v('email', s=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s),'e-email') && ok;
+    return ok;
   }
-}
-</script>
-<!-- Google Maps Autocomplete -->
-<script>
-const ZONAS_COBERTURA = [
-  'miraflores', 'san isidro', 'barranco', 'santiago de surco', 'surco',
-  'la molina', 'san borja', 'jesús maría', 'jesus maria',
-  'lince', 'pueblo libre', 'magdalena del mar', 'magdalena',
-  'san miguel', 'chorrillos'
-];
-
-function normalizarDistrito(texto) {
-  return texto.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .trim();
+  if (n===2) {
+    let ok = true;
+    if (!dir1OK) { $('e-dir1').classList.add('on'); $('dir1').classList.add('err'); ok=false; }
+    if (!$('distrito').value) { $('e-distrito').classList.add('on'); ok=false; }
+    return ok;
+  }
+  if (n===3) {
+    const ok = $('chk-tyc').checked && $('chk-datos').checked;
+    $('e-tyc').style.display = ok ? 'none' : 'block';
+    return ok;
+  }
+  return true;
 }
 
-function mostrarDistrito(nombre) {
-  const display = document.getElementById('distrito-display');
-  const input = document.getElementById('distrito');
-  const err = document.getElementById('err-distrito');
+function toggle2() {
+  const g=$('g-dir2'), b=$('btn-dir2');
+  const vis = g.style.display!=='none';
+  g.style.display = vis?'none':'block';
+  b.textContent = vis?'+ Agregar segunda dirección':'− Quitar segunda dirección';
+}
 
-  const normalizado = normalizarDistrito(nombre);
-  const enCobertura = ZONAS_COBERTURA.some(z => normalizado.includes(z));
+function calcSena() {
+  const c=parseInt($('cajones').value);
+  $('monto').textContent=`S/ ${c*50}`;
+  $('detalle').textContent=`${c} cajón${c>1?'es':''} × S/50 = S/${c*50}`;
+}
 
-  if (enCobertura) {
-    display.textContent = nombre;
-    display.style.color = 'var(--verde)';
-    display.style.borderColor = 'var(--verde)';
-    input.value = nombre;
-    err.classList.remove('visible');
+function setDistrito(nombre) {
+  const d=$('dsp-distrito'), i=$('distrito'), e=$('e-distrito');
+  const enZona = ZONAS.some(z=>norm(nombre).includes(norm(z)));
+  if (enZona) {
+    d.textContent=nombre; d.className='dsp ok'; i.value=nombre; e.classList.remove('on');
   } else {
-    display.textContent = `${nombre} — Por ahora no llegamos a esta zona`;
-    display.style.color = 'var(--rojo)';
-    display.style.borderColor = 'var(--rojo)';
-    input.value = '';
-    err.classList.add('visible');
+    d.textContent=`${nombre} — Sin cobertura aún`; d.className='dsp err'; i.value=''; e.classList.add('on');
   }
 }
 
-function extraerDistrito(components) {
-  for (const c of components) {
-    if (c.types.includes('sublocality_level_1') ||
-        c.types.includes('sublocality') ||
-        c.types.includes('locality')) {
-      return c.long_name;
-    }
+function getDistrito(comps) {
+  for (const c of comps) {
+    if (c.types.includes('sublocality_level_1')||c.types.includes('sublocality')||c.types.includes('locality')) return c.long_name;
   }
   return null;
 }
 
-function initMaps() {
-  const opciones = {
-    componentRestrictions: { country: 'pe' },
-    fields: ['geometry', 'formatted_address', 'address_components'],
-    bounds: new google.maps.LatLngBounds(
-      new google.maps.LatLng(-12.20, -77.15),
-      new google.maps.LatLng(-11.90, -76.90)
-    )
+async function enviar() {
+  if (!v('comprobante',s=>s.length>=3,'e-comp')) return;
+  $('btn-env').style.display='none'; $('spin').classList.add('on');
+  const d1=$('dir1').value.trim(), dp1=$('dpto1').value.trim();
+  const d2=$('dir2').value.trim(), dp2=$('dpto2').value.trim();
+  const data = {
+    nombre:$('nombre').value.trim(), apellido:$('apellido').value.trim(),
+    dni:`${$('tipo-doc').value}: ${$('dni').value.trim()}`,
+    telefono:$('tel').value.trim(), email:$('email').value.trim(),
+    direccion_1: d1+(dp1?` — ${dp1}`:''),
+    direccion_2: d2?(d2+(dp2?` — ${dp2}`:'')):null,
+    distrito:$('distrito').value,
+    latitud:parseFloat($('lat1').value)||null, longitud:parseFloat($('lng1').value)||null,
+    cajones_asignados:parseInt($('cajones').value),
+    estado:'pendiente', sena_pagada:false,
+    notas:`Comprobante: ${$('comprobante').value.trim()}. ${$('notas').value.trim()}`
   };
+  try {
+    const {error} = await sb.from('clientes').insert([data]);
+    if (error) throw error;
+    $('paso-4').classList.remove('on');
+    document.querySelector('.tabs').style.display='none';
+    $('exito').style.display='block';
+  } catch(err) {
+    $('spin').classList.remove('on'); $('btn-env').style.display='inline-block';
+    alert(err.message?.includes('duplicate') ? 'Ya existe una cuenta con ese DNI, teléfono o email.' : 'Hubo un problema. Intentá de nuevo o escribinos por WhatsApp.');
+  }
+}
 
-  // Autocomplete dirección 1
-  const ac1 = new google.maps.places.Autocomplete(
-    document.getElementById('direccion1'), opciones
-  );
-  ac1.addListener('place_changed', () => {
-    const place = ac1.getPlace();
-    if (!place.geometry) return;
-    document.getElementById('lat1').value = place.geometry.location.lat();
-    document.getElementById('lng1').value = place.geometry.location.lng();
-    document.getElementById('direccion1').classList.add('ok');
-    const distrito = extraerDistrito(place.address_components);
-    if (distrito) mostrarDistrito(distrito);
+function initMaps() {
+  const bounds = new google.maps.LatLngBounds(new google.maps.LatLng(-12.20,-77.15),new google.maps.LatLng(-11.90,-76.90));
+  const mOpts = {componentRestrictions:{country:'pe'},fields:['geometry','formatted_address','address_components'],bounds};
+  const style = [
+    {elementType:'geometry',stylers:[{color:'#1a1a1a'}]},
+    {elementType:'labels.text.fill',stylers:[{color:'#ffc000'}]},
+    {elementType:'labels.text.stroke',stylers:[{color:'#000'}]},
+    {featureType:'road',elementType:'geometry',stylers:[{color:'#2a2a2a'}]},
+    {featureType:'water',elementType:'geometry',stylers:[{color:'#000055'}]},
+    {featureType:'poi',stylers:[{visibility:'off'}]},
+    {featureType:'transit',stylers:[{visibility:'off'}]}
+  ];
+  const mapCfg = {zoom:16,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,styles:style};
+  const pinIcon = {path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:'#ffc000',fillOpacity:1,strokeColor:'#000',strokeWeight:2};
+
+  const m1=new google.maps.Map($('map1'),mapCfg);
+  const mk1=new google.maps.Marker({map:m1,draggable:true,icon:pinIcon});
+  mk1.addListener('dragend',e=>{$('lat1').value=e.latLng.lat();$('lng1').value=e.latLng.lng();});
+  const ac1=new google.maps.places.Autocomplete($('dir1'),mOpts);
+  ac1.addListener('place_changed',()=>{
+    const p=ac1.getPlace(); if(!p.geometry) return;
+    const l=p.geometry.location;
+    $('map1').style.display='block'; $('g-dpto1').style.display='block';
+    $('lat1').value=l.lat(); $('lng1').value=l.lng();
+    m1.setCenter(l); m1.setZoom(17); mk1.setPosition(l); mk1.setVisible(true);
+    $('dir1').classList.add('ok'); $('e-dir1').classList.remove('on');
+    dir1OK=true;
+    const dist=getDistrito(p.address_components); if(dist) setDistrito(dist);
   });
 
-  // Autocomplete dirección 2
-  const ac2 = new google.maps.places.Autocomplete(
-    document.getElementById('direccion2'), opciones
-  );
-  ac2.addListener('place_changed', () => {
-    const place = ac2.getPlace();
-    if (!place.geometry) return;
-    document.getElementById('lat2').value = place.geometry.location.lat();
-    document.getElementById('lng2').value = place.geometry.location.lng();
+  const m2=new google.maps.Map($('map2'),mapCfg);
+  const mk2=new google.maps.Marker({map:m2,draggable:true,icon:pinIcon});
+  mk2.addListener('dragend',e=>{$('lat2').value=e.latLng.lat();$('lng2').value=e.latLng.lng();});
+  const ac2=new google.maps.places.Autocomplete($('dir2'),mOpts);
+  ac2.addListener('place_changed',()=>{
+    const p=ac2.getPlace(); if(!p.geometry) return;
+    const l=p.geometry.location;
+    $('map2').style.display='block';
+    $('lat2').value=l.lat(); $('lng2').value=l.lng();
+    m2.setCenter(l); m2.setZoom(17); mk2.setPosition(l); mk2.setVisible(true);
   });
 }
 </script>
