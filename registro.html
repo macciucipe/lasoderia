@@ -397,6 +397,7 @@ async function verificarOTP() {
 }
 
 
+function cambiarDoc() {
   const t = $('tipo-doc').value;
   $('lbl-doc').textContent = t==='DNI' ? 'Número de DNI *' : 'Número de CE *';
   $('dni').placeholder = t==='DNI' ? '12345678' : '001234567';
