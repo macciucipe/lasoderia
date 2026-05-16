@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Panel Repartidor — La Sodería ATR</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --negro: #000; --amarillo: #ffc000; --azul: #0000ff;
+  --blanco: #fff; --gris: #111; --gris-medio: #1e1e1e;
+  --verde: #00cc44; --rojo: #ff3333;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--negro);color:var(--blanco);font-family:'Barlow',sans-serif;min-height:100vh;}
+
+/* ─── NAV ─── */
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:56px;background:var(--negro);border-bottom:2px solid var(--amarillo);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--amarillo);letter-spacing:0.08em;}
+.nav-logo span{color:var(--azul);}
+#nav-info{font-size:0.8rem;color:rgba(255,255,255,0.5);display:none;}
+#btn-logout{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);padding:0.3rem 0.8rem;font-size:0.75rem;cursor:pointer;font-family:'Barlow',sans-serif;display:none;}
+#btn-logout:hover{border-color:var(--rojo);color:var(--rojo);}
+
+/* ─── WRAP ─── */
+.wrap{max-width:480px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+
+/* ─── LOGIN ─── */
+#screen-login{}
+.login-hdr{text-align:center;margin-bottom:2.5rem;}
+.login-hdr h1{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--blanco);line-height:1;}
+.login-hdr h1 em{color:var(--amarillo);font-style:normal;}
+.login-hdr p{font-size:0.85rem;color:rgba(255,255,255,0.4);margin-top:0.5rem;}
+
+.fg{margin-bottom:1.2rem;}
+label{display:block;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.4rem;}
+input[type=text],input[type=password],input[type=tel],input[type=number],select,textarea{
+  width:100%;padding:0.85rem 1rem;background:var(--gris-medio);
+  border:1.5px solid rgba(255,255,255,0.1);color:var(--blanco);
+  font-family:'Barlow',sans-serif;font-size:1rem;outline:none;
+  transition:border-color 0.2s;appearance:none;
+}
+input:focus,select:focus{border-color:var(--amarillo);}
+input.err{border-color:var(--rojo);}
+input.ok{border-color:var(--verde);}
+.ferr{font-size:0.78rem;color:var(--rojo);margin-top:0.35rem;display:none;}
+.ferr.on{display:block;}
+
+.btn-p{background:var(--amarillo);color:var(--negro);font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;padding:1rem;border:none;cursor:pointer;width:100%;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:background 0.15s;}
+.btn-p:hover{background:var(--blanco);}
+.btn-p:disabled{background:rgba(255,192,0,0.3);color:rgba(0,0,0,0.4);cursor:not-allowed;}
+.btn-s2{background:transparent;color:rgba(255,255,255,0.5);font-family:'Barlow',sans-serif;font-size:0.85rem;border:1px solid rgba(255,255,255,0.15);padding:0.7rem 1.2rem;cursor:pointer;transition:all 0.2s;width:100%;}
+.btn-s2:hover{border-color:var(--amarillo);color:var(--amarillo);}
+
+/* ─── SCREENS ─── */
+.screen{display:none;}
+.screen.on{display:block;}
+
+/* ─── PANEL PRINCIPAL ─── */
+.greeting{margin-bottom:2rem;}
+.greeting h2{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--blanco);line-height:1;}
+.greeting h2 em{color:var(--amarillo);font-style:normal;}
+.greeting p{font-size:0.85rem;color:rgba(255,255,255,0.4);margin-top:0.3rem;}
+
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem;}
+.menu-card{background:var(--gris-medio);border:1px solid rgba(255,255,255,0.08);padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:all 0.2s;}
+.menu-card:hover{border-color:var(--amarillo);background:rgba(255,192,0,0.05);}
+.menu-card .ico{font-size:2rem;display:block;margin-bottom:0.5rem;}
+.menu-card h3{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:var(--blanco);}
+.menu-card p{font-size:0.75rem;color:rgba(255,255,255,0.35);margin-top:0.2rem;}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:2rem;}
+.stat-card{background:var(--gris-medio);border:1px solid rgba(255,255,255,0.06);padding:1rem;text-align:center;}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--amarillo);display:block;line-height:1;}
+.stat-l{font-size:0.65rem;color:rgba(255,255,255,0.35);letter-spacing:0.08em;text-transform:uppercase;margin-top:0.2rem;display:block;}
+
+/* ─── BUSCAR CLIENTE ─── */
+.back-btn{background:none;border:none;color:rgba(255,255,255,0.4);font-size:0.82rem;cursor:pointer;padding:0 0 1.5rem;font-family:'Barlow',sans-serif;display:flex;align-items:center;gap:0.4rem;}
+.back-btn:hover{color:var(--amarillo);}
+.search-box{display:flex;gap:0.75rem;margin-bottom:1.5rem;}
+.search-box input{flex:1;}
+.btn-buscar{background:var(--azul);color:var(--blanco);border:none;padding:0 1.2rem;font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background 0.2s;}
+.btn-buscar:hover{background:#0000cc;}
+
+.cliente-card{background:var(--gris-medio);border:1px solid rgba(255,255,255,0.1);padding:1.25rem;margin-bottom:1.5rem;}
+.cliente-card h3{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:900;color:var(--amarillo);letter-spacing:0.05em;margin-bottom:0.5rem;}
+.cliente-card .info-row{display:flex;justify-content:space-between;font-size:0.82rem;padding:0.3rem 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.cliente-card .info-row span:first-child{color:rgba(255,255,255,0.4);}
+.cliente-card .info-row span:last-child{color:var(--blanco);font-weight:500;}
+.badge{display:inline-block;padding:0.2rem 0.6rem;font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;}
+.badge.activo{background:rgba(0,204,68,0.15);color:var(--verde);}
+.badge.pendiente{background:rgba(255,192,0,0.15);color:var(--amarillo);}
+.badge.inactivo{background:rgba(255,51,51,0.15);color:var(--rojo);}
+
+.no-registrado{background:rgba(255,192,0,0.06);border:1px solid rgba(255,192,0,0.2);border-left:4px solid var(--amarillo);padding:1rem 1.25rem;margin-bottom:1.5rem;}
+.no-registrado p{font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.55;}
+.no-registrado strong{color:var(--amarillo);}
+
+/* ─── REGISTRO VENTA ─── */
+.venta-section{background:var(--gris-medio);border:1px solid rgba(255,255,255,0.08);padding:1.25rem;margin-bottom:1.5rem;}
+.venta-section h4{font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:1rem;}
+
+.counter-row{display:flex;align-items:center;gap:1rem;justify-content:center;margin:0.5rem 0;}
+.counter-btn{background:var(--gris);border:1px solid rgba(255,255,255,0.15);color:var(--blanco);width:44px;height:44px;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.counter-btn:hover{border-color:var(--amarillo);color:var(--amarillo);}
+.counter-val{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--amarillo);min-width:60px;text-align:center;line-height:1;}
+
+.monto-display{background:var(--negro);border:1px solid rgba(255,192,0,0.2);padding:1rem;text-align:center;margin:1rem 0;}
+.monto-display .label{font-size:0.72rem;color:rgba(255,255,255,0.35);letter-spacing:0.1em;text-transform:uppercase;}
+.monto-display .valor{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--amarillo);display:block;}
+
+/* ─── HISTORIAL ─── */
+.pedido-item{background:var(--gris-medio);border:1px solid rgba(255,255,255,0.06);padding:1rem;margin-bottom:0.75rem;}
+.pedido-item .pi-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;}
+.pedido-item .pi-nombre{font-weight:700;font-size:0.95rem;}
+.pedido-item .pi-hora{font-size:0.75rem;color:rgba(255,255,255,0.35);}
+.pedido-item .pi-detalle{font-size:0.82rem;color:rgba(255,255,255,0.5);}
+.pedido-item .pi-monto{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--verde);}
+
+.empty-state{text-align:center;padding:3rem 0;color:rgba(255,255,255,0.2);}
+.empty-state .ico{font-size:3rem;display:block;margin-bottom:0.75rem;}
+.empty-state p{font-size:0.85rem;}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(5rem);background:var(--verde);color:var(--negro);padding:0.85rem 1.5rem;font-weight:700;font-size:0.88rem;letter-spacing:0.05em;transition:transform 0.35s cubic-bezier(.16,1,.3,1);white-space:nowrap;z-index:999;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.error{background:var(--rojo);color:var(--blanco);}
+
+/* ─── LOADING ─── */
+.spin-wrap{display:none;justify-content:center;align-items:center;gap:0.75rem;padding:2rem;color:rgba(255,255,255,0.4);}
+.spin-wrap.on{display:flex;}
+.spin{width:20px;height:20px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--amarillo);border-radius:50%;animation:rot 0.7s linear infinite;}
+@keyframes rot{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">La <span>Sodería</span> ATR</div>
+  <span id="nav-info"></span>
+  <button id="btn-logout" onclick="logout()">Salir</button>
+</nav>
+
+<div class="wrap">
+
+  <!-- ══════════════════════════════ -->
+  <!-- LOGIN                         -->
+  <!-- ══════════════════════════════ -->
+  <div id="screen-login" class="screen on">
+    <div class="login-hdr" style="padding-top:2rem">
+      <h1>PANEL<br><em>REPARTIDOR</em></h1>
+      <p>Ingresá tu DNI y código de acceso</p>
+    </div>
+    <div class="fg">
+      <label>DNI</label>
+      <input type="text" id="login-dni" inputmode="numeric" maxlength="8" placeholder="12345678">
+      <div class="ferr" id="e-login-dni">Ingresá tu DNI</div>
+    </div>
+    <div class="fg">
+      <label>Código de acceso (4 dígitos)</label>
+      <input type="password" id="login-codigo" inputmode="numeric" maxlength="4" placeholder="••••">
+      <div class="ferr" id="e-login-codigo">Ingresá tu código</div>
+    </div>
+    <div class="ferr on" id="e-login-general" style="margin-bottom:1rem;display:none">DNI o código incorrectos</div>
+    <button class="btn-p" onclick="login()" id="btn-login">Ingresar →</button>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- PANEL PRINCIPAL               -->
+  <!-- ══════════════════════════════ -->
+  <div id="screen-panel" class="screen">
+    <div class="greeting">
+      <h2>Hola, <em id="rep-nombre">...</em></h2>
+      <p id="rep-fecha"></p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-n" id="stat-ventas">0</span>
+        <span class="stat-l">Ventas hoy</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-n" id="stat-sifones">0</span>
+        <span class="stat-l">Sifones</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-n" id="stat-monto">S/0</span>
+        <span class="stat-l">Cobrado</span>
+      </div>
+    </div>
+
+    <div class="menu-grid">
+      <div class="menu-card" onclick="ir('screen-venta')">
+        <span class="ico">🥤</span>
+        <h3>Nueva venta</h3>
+        <p>Registrar entrega</p>
+      </div>
+      <div class="menu-card" onclick="ir('screen-historial')">
+        <span class="ico">📋</span>
+        <h3>Mis ventas</h3>
+        <p>Historial del día</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- NUEVA VENTA                   -->
+  <!-- ══════════════════════════════ -->
+  <div id="screen-venta" class="screen">
+    <button class="back-btn" onclick="ir('screen-panel')">← Volver</button>
+
+    <div class="fg">
+      <label>Buscar cliente por DNI o teléfono</label>
+      <div class="search-box">
+        <input type="text" id="buscar-input" placeholder="DNI o número de WhatsApp" inputmode="numeric" onkeydown="if(event.key==='Enter') buscarCliente()">
+        <button class="btn-buscar" onclick="buscarCliente()">Buscar</button>
+      </div>
+    </div>
+
+    <div class="spin-wrap" id="spin-buscar"><div class="spin"></div><span>Buscando…</span></div>
+
+    <!-- Resultado cliente registrado -->
+    <div id="result-registrado" style="display:none">
+      <div class="cliente-card" id="cliente-info"></div>
+      <div id="form-venta"></div>
+    </div>
+
+    <!-- Cliente no registrado -->
+    <div id="result-no-registrado" style="display:none">
+      <div class="no-registrado">
+        <p><strong>Cliente no registrado.</strong> Podés registrar la venta con sus datos básicos.</p>
+      </div>
+      <div class="fg">
+        <label>Nombre del cliente</label>
+        <input type="text" id="nr-nombre" placeholder="Nombre y apellido">
+      </div>
+      <div class="fg">
+        <label>Teléfono</label>
+        <input type="tel" id="nr-tel" placeholder="+51 999 999 999">
+      </div>
+      <div id="form-venta-nr"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- HISTORIAL                     -->
+  <!-- ══════════════════════════════ -->
+  <div id="screen-historial" class="screen">
+    <button class="back-btn" onclick="ir('screen-panel')">← Volver</button>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;margin-bottom:1.5rem">MIS VENTAS <em style="color:var(--amarillo);font-style:normal">DE HOY</em></h2>
+    <div class="spin-wrap" id="spin-hist"><div class="spin"></div></div>
+    <div id="lista-ventas"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = supabase.createClient(
+  'https://rnyevcqqsjharrncswpl.supabase.co',
+  'sb_publishable_LRKrU-Pjchfp7Y1PqBRxWg_11BekgEF'
+);
+
+let repActual = null;
+let clienteActual = null;
+
+// ── Helpers ──
+function $(id){ return document.getElementById(id); }
+function ir(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  $(screen).classList.add('on');
+  if (screen === 'screen-historial') cargarHistorial();
+  if (screen === 'screen-panel') cargarStats();
+  if (screen === 'screen-venta') resetVenta();
+}
+
+function toast(msg, tipo='ok') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = `toast ${tipo==='err'?'error':''} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function formatFecha(iso) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit' });
+}
+
+// ── Login ──
+async function login() {
+  const dni = $('login-dni').value.trim();
+  const codigo = $('login-codigo').value.trim();
+  if (!dni || !codigo) {
+    if (!dni) $('e-login-dni').classList.add('on');
+    if (!codigo) $('e-login-codigo').classList.add('on');
+    return;
+  }
+  const btn = $('btn-login');
+  btn.textContent = 'Verificando…'; btn.disabled = true;
+
+  const { data, error } = await sb
+    .from('repartidores')
+    .select('*')
+    .eq('dni', dni)
+    .eq('codigo_acceso', codigo)
+    .eq('activo', true)
+    .single();
+
+  if (error || !data) {
+    $('e-login-general').style.display = 'block';
+    btn.textContent = 'Ingresar →'; btn.disabled = false;
+    return;
+  }
+
+  repActual = data;
+  $('e-login-general').style.display = 'none';
+  $('nav-info').style.display = 'block';
+  $('nav-info').textContent = data.nombre;
+  $('btn-logout').style.display = 'block';
+  $('rep-nombre').textContent = data.nombre;
+  $('rep-fecha').textContent = new Date().toLocaleDateString('es-PE', { weekday:'long', day:'numeric', month:'long' });
+  ir('screen-panel');
+  cargarStats();
+}
+
+function logout() {
+  repActual = null;
+  $('login-dni').value = '';
+  $('login-codigo').value = '';
+  $('nav-info').style.display = 'none';
+  $('btn-logout').style.display = 'none';
+  ir('screen-login');
+}
+
+// ── Stats del día ──
+async function cargarStats() {
+  if (!repActual) return;
+  const hoy = new Date().toISOString().split('T')[0];
+  const { data } = await sb
+    .from('pedidos')
+    .select('monto_cobrado, cajones_recibidos')
+    .eq('repartidor_id', repActual.id)
+    .gte('created_at', hoy);
+
+  if (data) {
+    $('stat-ventas').textContent = data.length;
+    const sifones = data.reduce((a,p) => a + (p.cajones_recibidos || 0) * 6, 0);
+    const monto = data.reduce((a,p) => a + (parseFloat(p.monto_cobrado) || 0), 0);
+    $('stat-sifones').textContent = sifones;
+    $('stat-monto').textContent = `S/${monto.toFixed(0)}`;
+  }
+}
+
+// ── Buscar cliente ──
+async function buscarCliente() {
+  const q = $('buscar-input').value.trim();
+  if (!q) return;
+
+  $('result-registrado').style.display = 'none';
+  $('result-no-registrado').style.display = 'none';
+  $('spin-buscar').classList.add('on');
+  clienteActual = null;
+
+  const { data } = await sb
+    .from('clientes')
+    .select('*')
+    .or(`dni.ilike.%${q}%,telefono.ilike.%${q}%`)
+    .single();
+
+  $('spin-buscar').classList.remove('on');
+
+  if (data) {
+    clienteActual = data;
+    const diasSinPedido = data.ultimo_pedido
+      ? Math.floor((Date.now() - new Date(data.ultimo_pedido)) / 86400000)
+      : null;
+    const badgeClass = data.estado === 'activo' ? 'activo' : data.estado === 'pendiente' ? 'pendiente' : 'inactivo';
+
+    $('cliente-info').innerHTML = `
+      <h3>${data.nombre} ${data.apellido}</h3>
+      <div class="info-row"><span>Estado</span><span><span class="badge ${badgeClass}">${data.estado}</span></span></div>
+      <div class="info-row"><span>Distrito</span><span>${data.distrito}</span></div>
+      <div class="info-row"><span>Cajones</span><span>${data.cajones_asignados}</span></div>
+      <div class="info-row"><span>Último pedido</span><span>${diasSinPedido !== null ? `hace ${diasSinPedido} días` : 'Sin pedidos'}</span></div>
+    `;
+    $('form-venta').innerHTML = buildFormVenta('registrado');
+    $('result-registrado').style.display = 'block';
+  } else {
+    $('form-venta-nr').innerHTML = buildFormVenta('no-registrado');
+    $('result-no-registrado').style.display = 'block';
+  }
+}
+
+function buildFormVenta(tipo) {
+  const prefix = tipo === 'registrado' ? '' : 'nr-';
+  return `
+    <div class="venta-section">
+      <h4>Sifones llenos entregados</h4>
+      <div class="counter-row">
+        <button class="counter-btn" onclick="cambiarCant('${prefix}llenos',-1)">−</button>
+        <div class="counter-val" id="${prefix}llenos-val">0</div>
+        <button class="counter-btn" onclick="cambiarCant('${prefix}llenos',1)">+</button>
+      </div>
+    </div>
+    <div class="venta-section">
+      <h4>Sifones vacíos recibidos</h4>
+      <div class="counter-row">
+        <button class="counter-btn" onclick="cambiarCant('${prefix}vacios',-1)">−</button>
+        <div class="counter-val" id="${prefix}vacios-val">0</div>
+        <button class="counter-btn" onclick="cambiarCant('${prefix}vacios',1)">+</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Monto cobrado (S/)</label>
+      <input type="number" id="${prefix}monto" placeholder="0.00" min="0" step="0.50" style="font-size:1.4rem;text-align:center">
+    </div>
+    <div class="fg">
+      <label>Notas (opcional)</label>
+      <textarea id="${prefix}notas" placeholder="Observaciones…" style="min-height:70px"></textarea>
+    </div>
+    <button class="btn-p" onclick="registrarVenta('${tipo}')">Registrar venta ✓</button>
+  `;
+}
+
+const contadores = {};
+function cambiarCant(id, delta) {
+  contadores[id] = Math.max(0, (contadores[id] || 0) + delta);
+  const el = $(`${id}-val`);
+  if (el) el.textContent = contadores[id];
+}
+
+// ── Registrar venta ──
+async function registrarVenta(tipo) {
+  const prefix = tipo === 'registrado' ? '' : 'nr-';
+  const llenos = contadores[`${prefix}llenos`] || 0;
+  const vacios = contadores[`${prefix}vacios`] || 0;
+  const monto = parseFloat($(`${prefix}monto`).value) || 0;
+  const notas = $(`${prefix}notas`).value.trim();
+
+  if (llenos === 0) { toast('Ingresá la cantidad de sifones entregados', 'err'); return; }
+  if (monto <= 0) { toast('Ingresá el monto cobrado', 'err'); return; }
+
+  let clienteId = null;
+  let clienteNombre = '';
+
+  if (tipo === 'registrado' && clienteActual) {
+    clienteId = clienteActual.id;
+    clienteNombre = `${clienteActual.nombre} ${clienteActual.apellido}`;
+  } else {
+    const nombre = $('nr-nombre').value.trim();
+    const tel = $('nr-tel').value.trim();
+    if (!nombre) { toast('Ingresá el nombre del cliente', 'err'); return; }
+    clienteNombre = nombre;
+    notas_extra = `Tel: ${tel}. `;
+  }
+
+  const pedido = {
+    cliente_id: clienteId,
+    repartidor_id: repActual.id,
+    direccion_entrega: clienteActual ? clienteActual.direccion_1 : 'Venta directa',
+    distrito: clienteActual ? clienteActual.distrito : 'Directo',
+    estado: 'entregado',
+    monto_cobrado: monto,
+    fecha_entrega: new Date().toISOString(),
+    cajones_recibidos: Math.floor(vacios / 6),
+    notas: `${tipo === 'no-registrado' ? `Cliente: ${clienteNombre}. ` : ''}${notas}`,
+    tipo_venta: tipo === 'registrado' ? 'delivery' : 'directa'
+  };
+
+  const { error } = await sb.from('pedidos').insert([pedido]);
+
+  if (error) {
+    toast('Error al registrar. Intentá de nuevo.', 'err');
+    return;
+  }
+
+  // Actualizar último pedido del cliente
+  if (clienteId) {
+    await sb.from('clientes').update({ ultimo_pedido: new Date().toISOString() }).eq('id', clienteId);
+  }
+
+  toast(`✓ Venta registrada — S/${monto.toFixed(0)}`);
+  setTimeout(() => ir('screen-panel'), 1500);
+}
+
+// ── Historial ──
+async function cargarHistorial() {
+  if (!repActual) return;
+  $('spin-hist').classList.add('on');
+  $('lista-ventas').innerHTML = '';
+
+  const hoy = new Date().toISOString().split('T')[0];
+  const { data } = await sb
+    .from('pedidos')
+    .select('*, clientes(nombre, apellido)')
+    .eq('repartidor_id', repActual.id)
+    .gte('created_at', hoy)
+    .order('created_at', { ascending: false });
+
+  $('spin-hist').classList.remove('on');
+
+  if (!data || data.length === 0) {
+    $('lista-ventas').innerHTML = `<div class="empty-state"><span class="ico">📭</span><p>No hay ventas registradas hoy</p></div>`;
+    return;
+  }
+
+  let totalMonto = 0;
+  let html = '';
+  data.forEach(p => {
+    const nombre = p.clientes ? `${p.clientes.nombre} ${p.clientes.apellido}` : (p.notas?.split('.')[0] || 'Cliente directo');
+    totalMonto += parseFloat(p.monto_cobrado) || 0;
+    html += `
+      <div class="pedido-item">
+        <div class="pi-header">
+          <span class="pi-nombre">${nombre}</span>
+          <span class="pi-hora">${formatFecha(p.created_at)}</span>
+        </div>
+        <div class="pi-detalle">${p.distrito} · ${p.tipo_venta || 'delivery'}</div>
+        <div class="pi-monto">S/${parseFloat(p.monto_cobrado).toFixed(0)}</div>
+      </div>`;
+  });
+
+  html += `<div style="background:var(--gris-medio);border:1px solid rgba(255,192,0,0.2);padding:1rem;text-align:center;margin-top:1rem">
+    <span style="font-size:0.72rem;color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase">Total del día</span>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--amarillo)">S/${totalMonto.toFixed(0)}</div>
+  </div>`;
+
+  $('lista-ventas').innerHTML = html;
+}
+
+function resetVenta() {
+  $('buscar-input').value = '';
+  $('result-registrado').style.display = 'none';
+  $('result-no-registrado').style.display = 'none';
+  clienteActual = null;
+  Object.keys(contadores).forEach(k => delete contadores[k]);
+}
+</script>
+</body>
+</html>
