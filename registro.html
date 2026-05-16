@@ -311,8 +311,15 @@ textarea { resize: vertical; min-height: 90px; }
       </div>
     </div>
     <div class="form-group">
-      <label>DNI *</label>
-      <input type="text" id="dni" placeholder="12345678" maxlength="8">
+      <label>Tipo de documento *</label>
+      <select id="tipo-doc" onchange="actualizarCampoDni()">
+        <option value="DNI">DNI — Documento Nacional de Identidad</option>
+        <option value="CE">CE — Carné de Extranjería</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label id="label-dni">Número de DNI *</label>
+      <input type="text" id="dni" inputmode="numeric" placeholder="12345678" maxlength="8">
       <div class="field-error" id="err-dni">Ingresá un DNI válido (8 dígitos)</div>
     </div>
     <div class="form-group">
@@ -501,6 +508,28 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let pasoActual = 1;
 
+// ── Tipo de documento ──
+function actualizarCampoDni() {
+  const tipo = document.getElementById('tipo-doc').value;
+  const label = document.getElementById('label-dni');
+  const input = document.getElementById('dni');
+  const err = document.getElementById('err-dni');
+
+  if (tipo === 'DNI') {
+    label.textContent = 'Número de DNI *';
+    input.placeholder = '12345678';
+    input.maxLength = 8;
+    err.textContent = 'Ingresá un DNI válido (8 dígitos)';
+  } else {
+    label.textContent = 'Número de Carné de Extranjería *';
+    input.placeholder = '001234567';
+    input.maxLength = 9;
+    err.textContent = 'Ingresá un CE válido (9 dígitos)';
+  }
+  input.value = '';
+  input.classList.remove('error', 'ok');
+}
+
 // ── Navegación entre pasos ──
 function irPaso(n) {
   if (n > pasoActual && !validarPaso(pasoActual)) return;
@@ -524,7 +553,15 @@ function validarPaso(n) {
   if (n === 1) {
     ok = validarCampo('nombre', v => v.length >= 2, 'err-nombre') && ok;
     ok = validarCampo('apellido', v => v.length >= 2, 'err-apellido') && ok;
-    ok = validarCampo('dni', v => /^\d{8}$/.test(v), 'err-dni') && ok;
+    const tipo = document.getElementById('tipo-doc').value;
+    const dniValidator = tipo === 'DNI'
+      ? v => /^\d{8}$/.test(v)
+      : v => /^\d{9}$/.test(v);
+    const dniMsg = tipo === 'DNI'
+      ? 'Ingresá un DNI válido (8 dígitos)'
+      : 'Ingresá un CE válido (9 dígitos)';
+    document.getElementById('err-dni').textContent = dniMsg;
+    ok = validarCampo('dni', dniValidator, 'err-dni') && ok;
     ok = validarCampo('telefono', v => v.length >= 7, 'err-telefono') && ok;
     ok = validarCampo('email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), 'err-email') && ok;
   }
@@ -585,7 +622,7 @@ async function enviarRegistro() {
   const data = {
     nombre: document.getElementById('nombre').value.trim(),
     apellido: document.getElementById('apellido').value.trim(),
-    dni: document.getElementById('dni').value.trim(),
+    dni: `${document.getElementById('tipo-doc').value}: ${document.getElementById('dni').value.trim()}`,
     telefono: document.getElementById('telefono').value.trim(),
     email: document.getElementById('email').value.trim(),
     direccion_1: document.getElementById('direccion1').value.trim(),
