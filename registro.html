@@ -100,7 +100,15 @@ textarea { resize:vertical; min-height:90px; }
 .exito h2 em { color:var(--amarillo); font-style:normal; }
 .exito p { color:rgba(255,255,255,0.55); line-height:1.7; max-width:480px; margin:0 auto 1rem; }
 
-.pac-container { background:var(--gris); border:1px solid var(--amarillo); font-family:'Barlow',sans-serif; z-index:9999; }
+.upload-box { border: 2px dashed rgba(255,255,255,0.15); padding: 1.5rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+.upload-box:hover { border-color: var(--amarillo); background: rgba(255,192,0,0.04); }
+.upload-box.ok { border-color: var(--verde); border-style: solid; }
+.upload-inner { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; color: rgba(255,255,255,0.45); font-size: 0.88rem; }
+.upload-ico { font-size: 2rem; }
+.upload-hint { font-size: 0.75rem; color: rgba(255,255,255,0.25); }
+.upload-preview { width: 100%; max-height: 180px; object-fit: contain; border-radius: 4px; }
+
+ background:var(--gris); border:1px solid var(--amarillo); font-family:'Barlow',sans-serif; z-index:9999; }
 .pac-item { color:var(--blanco); border-top:1px solid rgba(255,255,255,0.06); padding:0.5rem 1rem; cursor:pointer; }
 .pac-item:hover,.pac-item-selected { background:var(--gris-medio); }
 .pac-item-query { color:var(--amarillo); }
@@ -128,9 +136,10 @@ textarea { resize:vertical; min-height:90px; }
 
   <div class="tabs">
     <div class="tab on" id="tab-1"><span>01</span>Tus datos</div>
-    <div class="tab" id="tab-2"><span>02</span>Dirección</div>
-    <div class="tab" id="tab-3"><span>03</span>Términos</div>
-    <div class="tab" id="tab-4"><span>04</span>La seña</div>
+    <div class="tab" id="tab-2"><span>02</span>Verificación</div>
+    <div class="tab" id="tab-3"><span>03</span>Dirección</div>
+    <div class="tab" id="tab-4"><span>04</span>Términos</div>
+    <div class="tab" id="tab-5"><span>05</span>La seña</div>
   </div>
 
   <!-- PASO 1 -->
@@ -156,8 +165,56 @@ textarea { resize:vertical; min-height:90px; }
     <div class="btnrow"><button class="btn-s" onclick="ir(2)">Siguiente →</button></div>
   </div>
 
-  <!-- PASO 2 -->
+  <!-- PASO 2 — VERIFICACIÓN -->
   <div class="step" id="paso-2">
+    <div class="sbox" style="border-left-color:var(--azul)">
+      <h4 style="color:var(--azul)">¿Por qué verificamos tu identidad?</h4>
+      <p>Nuestros cajones valen USD 200 c/u. La verificación protege el equipo y nos permite ofrecerte un mejor servicio.</p>
+    </div>
+    <div class="fg">
+      <label>Frente del DNI / CE *</label>
+      <div class="upload-box" id="box-frente" onclick="document.getElementById('file-frente').click()">
+        <div class="upload-inner" id="prev-frente">
+          <div class="upload-ico">📄</div>
+          <span>Tocá para subir la foto del frente</span>
+          <span class="upload-hint">JPG, PNG o PDF · máx. 5MB</span>
+        </div>
+      </div>
+      <input type="file" id="file-frente" accept="image/jpeg,image/png,application/pdf" style="display:none" onchange="previewFile('frente')">
+      <div class="ferr" id="e-frente">Subí la foto del frente del documento</div>
+    </div>
+    <div class="fg">
+      <label>Dorso del DNI / CE *</label>
+      <div class="upload-box" id="box-dorso" onclick="document.getElementById('file-dorso').click()">
+        <div class="upload-inner" id="prev-dorso">
+          <div class="upload-ico">📄</div>
+          <span>Tocá para subir la foto del dorso</span>
+          <span class="upload-hint">JPG, PNG o PDF · máx. 5MB</span>
+        </div>
+      </div>
+      <input type="file" id="file-dorso" accept="image/jpeg,image/png,application/pdf" style="display:none" onchange="previewFile('dorso')">
+      <div class="ferr" id="e-dorso">Subí la foto del dorso del documento</div>
+    </div>
+    <div class="fg">
+      <label>Selfie sosteniendo el documento *</label>
+      <div class="upload-box" id="box-selfie" onclick="document.getElementById('file-selfie').click()">
+        <div class="upload-inner" id="prev-selfie">
+          <div class="upload-ico">🤳</div>
+          <span>Selfie con el documento visible</span>
+          <span class="upload-hint">Tu cara y el documento deben verse claramente</span>
+        </div>
+      </div>
+      <input type="file" id="file-selfie" accept="image/jpeg,image/png" style="display:none" onchange="previewFile('selfie')">
+      <div class="ferr" id="e-selfie">Subí una selfie sosteniendo tu documento</div>
+    </div>
+    <div class="btnrow">
+      <button class="btn-a" onclick="ir(1)">← Anterior</button>
+      <button class="btn-s" onclick="ir(3)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 3 — DIRECCIÓN -->
+  <div class="step" id="paso-3">
     <div class="fg">
       <label>Distrito</label>
       <div class="dsp" id="dsp-distrito">Se completa automáticamente con la dirección</div>
@@ -185,13 +242,13 @@ textarea { resize:vertical; min-height:90px; }
 
     <button class="add-btn" onclick="toggle2()" id="btn-dir2">+ Agregar segunda dirección</button>
     <div class="btnrow">
-      <button class="btn-a" onclick="ir(1)">← Anterior</button>
-      <button class="btn-s" onclick="ir(3)">Siguiente →</button>
+      <button class="btn-a" onclick="ir(2)">← Anterior</button>
+      <button class="btn-s" onclick="ir(4)">Siguiente →</button>
     </div>
   </div>
 
-  <!-- PASO 3 -->
-  <div class="step" id="paso-3">
+  <!-- PASO 4 — TÉRMINOS -->
+  <div class="step" id="paso-4">
     <div class="tyc-box">
       <h4>Términos y Condiciones — La Sodería ATR</h4>
       <p><strong>1. El servicio</strong><br>La Sodería ATR provee soda carbonatada en sifones retornables a domicilio en Lima Metropolitana. El cliente no adquiere los sifones ni los cajones en propiedad — los recibe en préstamo bajo depósito (seña).</p>
@@ -203,20 +260,17 @@ textarea { resize:vertical; min-height:90px; }
       <p><strong>7. Cancelación</strong><br>El cliente puede cancelar con 7 días de anticipación, coordinando la devolución y restitución de la seña.</p>
       <p><strong>8. Protección de datos</strong><br>Los datos son recopilados exclusivamente para la prestación del servicio, en cumplimiento con la Ley N° 29733. No serán utilizados con fines de marketing ni compartidos con terceros sin consentimiento expreso.</p>
     </div>
-
-    <div class="ferr on" id="e-tyc" style="display:none">Debés aceptar ambas casillas para continuar.</div>
-
+    <div class="ferr" id="e-tyc" style="display:none">Debés aceptar ambas casillas para continuar.</div>
     <label class="chk"><input type="checkbox" id="chk-tyc"><span>He leído y acepto los <a href="#">Términos y Condiciones</a>, incluyendo la seña, el costo real del equipo y la regla de los 45 días.</span></label>
     <label class="chk"><input type="checkbox" id="chk-datos"><span>Acepto el tratamiento de mis datos personales conforme a la Ley N° 29733 y confirmo que la información es verídica.</span></label>
-
     <div class="btnrow">
-      <button class="btn-a" onclick="ir(2)">← Anterior</button>
-      <button class="btn-s" onclick="ir(4)">Siguiente →</button>
+      <button class="btn-a" onclick="ir(3)">← Anterior</button>
+      <button class="btn-s" onclick="ir(5)">Siguiente →</button>
     </div>
   </div>
 
-  <!-- PASO 4 -->
-  <div class="step" id="paso-4">
+  <!-- PASO 5 — LA SEÑA -->
+  <div class="step" id="paso-5">
     <div class="sbox"><h4>¿Cuántos cajones querés?</h4><p>Cada cajón trae 6 sifones. Podés tener hasta 2 sin autorización especial.</p></div>
     <div class="fg">
       <label>Cantidad de cajones *</label>
@@ -242,7 +296,7 @@ textarea { resize:vertical; min-height:90px; }
     <div class="fg"><label>Número de operación *</label><input type="text" id="comprobante" placeholder="Ej: 123456789"><div class="ferr" id="e-comp">Ingresá el número de operación</div></div>
     <div class="fg"><label>Notas adicionales (opcional)</label><textarea id="notas" placeholder="Referencia de dirección, portero, horario preferido…"></textarea></div>
     <div class="btnrow">
-      <button class="btn-a" onclick="ir(3)">← Anterior</button>
+      <button class="btn-a" onclick="ir(4)">← Anterior</button>
       <button class="btn-s" id="btn-env" onclick="enviar()">Confirmar registro →</button>
       <div class="spin-wrap" id="spin"><div class="spin"></div><span>Guardando…</span></div>
     </div>
@@ -291,6 +345,25 @@ function ir(n) {
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+function previewFile(tipo) {
+  const input = $(`file-${tipo}`);
+  const box = $(`box-${tipo}`);
+  const prev = $(`prev-${tipo}`);
+  const file = input.files[0];
+  if (!file) return;
+  box.classList.add('ok');
+  $(`e-${tipo}`).classList.remove('on');
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      prev.innerHTML = `<img src="${e.target.result}" class="upload-preview"><span style="color:var(--verde);font-size:0.8rem;margin-top:0.5rem">✓ ${file.name}</span>`;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    prev.innerHTML = `<div class="upload-ico">📄</div><span style="color:var(--verde)">✓ ${file.name}</span>`;
+  }
+}
+
 function validar(n) {
   if (n===1) {
     let ok = true;
@@ -305,11 +378,18 @@ function validar(n) {
   }
   if (n===2) {
     let ok = true;
+    if (!$('file-frente').files[0]) { $('e-frente').classList.add('on'); ok=false; }
+    if (!$('file-dorso').files[0]) { $('e-dorso').classList.add('on'); ok=false; }
+    if (!$('file-selfie').files[0]) { $('e-selfie').classList.add('on'); ok=false; }
+    return ok;
+  }
+  if (n===3) {
+    let ok = true;
     if (!dir1OK) { $('e-dir1').classList.add('on'); $('dir1').classList.add('err'); ok=false; }
     if (!$('distrito').value) { $('e-distrito').classList.add('on'); ok=false; }
     return ok;
   }
-  if (n===3) {
+  if (n===4) {
     const ok = $('chk-tyc').checked && $('chk-datos').checked;
     $('e-tyc').style.display = ok ? 'none' : 'block';
     return ok;
@@ -350,29 +430,54 @@ function getDistrito(comps) {
 async function enviar() {
   if (!v('comprobante',s=>s.length>=3,'e-comp')) return;
   $('btn-env').style.display='none'; $('spin').classList.add('on');
-  const d1=$('dir1').value.trim(), dp1=$('dpto1').value.trim();
-  const d2=$('dir2').value.trim(), dp2=$('dpto2').value.trim();
-  const data = {
-    nombre:$('nombre').value.trim(), apellido:$('apellido').value.trim(),
-    dni:`${$('tipo-doc').value}: ${$('dni').value.trim()}`,
-    telefono:$('tel').value.trim(), email:$('email').value.trim(),
-    direccion_1: d1+(dp1?` — ${dp1}`:''),
-    direccion_2: d2?(d2+(dp2?` — ${dp2}`:'')):null,
-    distrito:$('distrito').value,
-    latitud:parseFloat($('lat1').value)||null, longitud:parseFloat($('lng1').value)||null,
-    cajones_asignados:parseInt($('cajones').value),
-    estado:'pendiente', sena_pagada:false,
-    notas:`Comprobante: ${$('comprobante').value.trim()}. ${$('notas').value.trim()}`
-  };
+
+  const dni = $('dni').value.trim();
+  const folder = `${$('tipo-doc').value}_${dni}_${Date.now()}`;
+
+  // Subir documentos a Storage
+  async function subirArchivo(inputId, nombre) {
+    const file = $(inputId).files[0];
+    if (!file) return null;
+    const ext = file.name.split('.').pop();
+    const path = `${folder}/${nombre}.${ext}`;
+    const { error } = await sb.storage.from('documentos-clientes').upload(path, file);
+    if (error) throw error;
+    return path;
+  }
+
   try {
+    const [pathFrente, pathDorso, pathSelfie] = await Promise.all([
+      subirArchivo('file-frente', 'frente'),
+      subirArchivo('file-dorso', 'dorso'),
+      subirArchivo('file-selfie', 'selfie')
+    ]);
+
+    const d1=$('dir1').value.trim(), dp1=$('dpto1').value.trim();
+    const d2=$('dir2').value.trim(), dp2=$('dpto2').value.trim();
+
+    const data = {
+      nombre:$('nombre').value.trim(), apellido:$('apellido').value.trim(),
+      dni:`${$('tipo-doc').value}: ${dni}`,
+      telefono:$('tel').value.trim(), email:$('email').value.trim(),
+      direccion_1: d1+(dp1?` — ${dp1}`:''),
+      direccion_2: d2?(d2+(dp2?` — ${dp2}`:'')):null,
+      distrito:$('distrito').value,
+      latitud:parseFloat($('lat1').value)||null, longitud:parseFloat($('lng1').value)||null,
+      cajones_asignados:parseInt($('cajones').value),
+      estado:'pendiente', sena_pagada:false,
+      notas:`Comprobante: ${$('comprobante').value.trim()}. Docs: ${folder}. ${$('notas').value.trim()}`
+    };
+
     const {error} = await sb.from('clientes').insert([data]);
     if (error) throw error;
-    $('paso-4').classList.remove('on');
+
+    $('paso-5').classList.remove('on');
     document.querySelector('.tabs').style.display='none';
     $('exito').style.display='block';
   } catch(err) {
     $('spin').classList.remove('on'); $('btn-env').style.display='inline-block';
     alert(err.message?.includes('duplicate') ? 'Ya existe una cuenta con ese DNI, teléfono o email.' : 'Hubo un problema. Intentá de nuevo o escribinos por WhatsApp.');
+    console.error(err);
   }
 }
 
