@@ -342,37 +342,24 @@ textarea { resize: vertical; min-height: 90px; }
   <!-- ══════════════════════════════════ -->
   <div class="paso-contenido" id="paso-2">
     <div class="form-group">
-      <label>Distrito *</label>
-      <select id="distrito">
-        <option value="">Seleccioná tu distrito…</option>
-        <option>Miraflores</option>
-        <option>San Isidro</option>
-        <option>Barranco</option>
-        <option>Surco</option>
-        <option>La Molina</option>
-        <option>San Borja</option>
-        <option>Jesús María</option>
-        <option>Lince</option>
-        <option>Pueblo Libre</option>
-        <option>Magdalena</option>
-        <option>San Miguel</option>
-        <option>Chorrillos</option>
-      </select>
-      <div class="field-error" id="err-distrito">Seleccioná un distrito</div>
+      <label id="label-distrito">Distrito</label>
+      <div id="distrito-display" style="padding:0.85rem 1rem;background:var(--gris-medio);border:1.5px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.35);font-size:0.95rem;">
+        Se completa automáticamente con la dirección
+      </div>
+      <input type="hidden" id="distrito">
+      <div class="field-error" id="err-distrito">La dirección ingresada no está en nuestra zona de cobertura</div>
     </div>
     <div class="form-group">
       <label>Dirección principal *</label>
       <input type="text" id="direccion1" placeholder="Escribí tu dirección…" autocomplete="off">
       <div class="field-error" id="err-direccion1">Ingresá tu dirección</div>
     </div>
-    <div id="mapa1" style="width:100%;height:220px;margin-top:0.75rem;border:1.5px solid rgba(255,192,0,0.2);display:none;"></div>
     <input type="hidden" id="lat1">
     <input type="hidden" id="lng1">
 
     <div class="form-group" id="grupo-dir2" style="display:none;margin-top:1.5rem">
       <label>Segunda dirección (opcional)</label>
       <input type="text" id="direccion2" placeholder="Escribí otra dirección…" autocomplete="off">
-      <div id="mapa2" style="width:100%;height:220px;margin-top:0.75rem;border:1.5px solid rgba(255,192,0,0.2);display:none;"></div>
       <input type="hidden" id="lat2">
       <input type="hidden" id="lng2">
     </div>
@@ -666,77 +653,88 @@ async function enviarRegistro() {
   }
 }
 </script>
-<!-- Google Maps -->
+<!-- Google Maps Autocomplete -->
 <script>
-let map1, map2, marker1, marker2, autocomplete1, autocomplete2;
+const ZONAS_COBERTURA = [
+  'miraflores', 'san isidro', 'barranco', 'santiago de surco', 'surco',
+  'la molina', 'san borja', 'jesús maría', 'jesus maria',
+  'lince', 'pueblo libre', 'magdalena del mar', 'magdalena',
+  'san miguel', 'chorrillos'
+];
+
+function normalizarDistrito(texto) {
+  return texto.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
+function mostrarDistrito(nombre) {
+  const display = document.getElementById('distrito-display');
+  const input = document.getElementById('distrito');
+  const err = document.getElementById('err-distrito');
+
+  const normalizado = normalizarDistrito(nombre);
+  const enCobertura = ZONAS_COBERTURA.some(z => normalizado.includes(z));
+
+  if (enCobertura) {
+    display.textContent = nombre;
+    display.style.color = 'var(--verde)';
+    display.style.borderColor = 'var(--verde)';
+    input.value = nombre;
+    err.classList.remove('visible');
+  } else {
+    display.textContent = `${nombre} — Por ahora no llegamos a esta zona`;
+    display.style.color = 'var(--rojo)';
+    display.style.borderColor = 'var(--rojo)';
+    input.value = '';
+    err.classList.add('visible');
+  }
+}
+
+function extraerDistrito(components) {
+  for (const c of components) {
+    if (c.types.includes('sublocality_level_1') ||
+        c.types.includes('sublocality') ||
+        c.types.includes('locality')) {
+      return c.long_name;
+    }
+  }
+  return null;
+}
 
 function initMaps() {
-  const limaCenter = { lat: -12.0464, lng: -77.0428 };
-  const mapOpts = {
-    zoom: 15,
-    center: limaCenter,
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: false,
-    styles: [
-      { elementType: 'geometry', stylers: [{ color: '#1e1e1e' }] },
-      { elementType: 'labels.text.fill', stylers: [{ color: '#ffc000' }] },
-      { elementType: 'labels.text.stroke', stylers: [{ color: '#000000' }] },
-      { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#333333' }] },
-      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0000aa' }] },
-      { featureType: 'poi', stylers: [{ visibility: 'off' }] }
-    ]
+  const opciones = {
+    componentRestrictions: { country: 'pe' },
+    fields: ['geometry', 'formatted_address', 'address_components'],
+    bounds: new google.maps.LatLngBounds(
+      new google.maps.LatLng(-12.20, -77.15),
+      new google.maps.LatLng(-11.90, -76.90)
+    )
   };
 
-  // Mapa 1
-  map1 = new google.maps.Map(document.getElementById('mapa1'), mapOpts);
-  marker1 = new google.maps.Marker({ map: map1, draggable: true });
-  marker1.addListener('dragend', e => {
-    document.getElementById('lat1').value = e.latLng.lat();
-    document.getElementById('lng1').value = e.latLng.lng();
-  });
-
-  // Autocomplete 1
-  autocomplete1 = new google.maps.places.Autocomplete(
-    document.getElementById('direccion1'),
-    { componentRestrictions: { country: 'pe' }, fields: ['geometry', 'formatted_address'] }
+  // Autocomplete dirección 1
+  const ac1 = new google.maps.places.Autocomplete(
+    document.getElementById('direccion1'), opciones
   );
-  autocomplete1.addListener('place_changed', () => {
-    const place = autocomplete1.getPlace();
+  ac1.addListener('place_changed', () => {
+    const place = ac1.getPlace();
     if (!place.geometry) return;
-    const loc = place.geometry.location;
-    document.getElementById('mapa1').style.display = 'block';
-    document.getElementById('lat1').value = loc.lat();
-    document.getElementById('lng1').value = loc.lng();
-    map1.setCenter(loc);
-    marker1.setPosition(loc);
-    marker1.setVisible(true);
+    document.getElementById('lat1').value = place.geometry.location.lat();
+    document.getElementById('lng1').value = place.geometry.location.lng();
     document.getElementById('direccion1').classList.add('ok');
+    const distrito = extraerDistrito(place.address_components);
+    if (distrito) mostrarDistrito(distrito);
   });
 
-  // Mapa 2
-  map2 = new google.maps.Map(document.getElementById('mapa2'), mapOpts);
-  marker2 = new google.maps.Marker({ map: map2, draggable: true });
-  marker2.addListener('dragend', e => {
-    document.getElementById('lat2').value = e.latLng.lat();
-    document.getElementById('lng2').value = e.latLng.lng();
-  });
-
-  // Autocomplete 2
-  autocomplete2 = new google.maps.places.Autocomplete(
-    document.getElementById('direccion2'),
-    { componentRestrictions: { country: 'pe' }, fields: ['geometry', 'formatted_address'] }
+  // Autocomplete dirección 2
+  const ac2 = new google.maps.places.Autocomplete(
+    document.getElementById('direccion2'), opciones
   );
-  autocomplete2.addListener('place_changed', () => {
-    const place = autocomplete2.getPlace();
+  ac2.addListener('place_changed', () => {
+    const place = ac2.getPlace();
     if (!place.geometry) return;
-    const loc = place.geometry.location;
-    document.getElementById('mapa2').style.display = 'block';
-    document.getElementById('lat2').value = loc.lat();
-    document.getElementById('lng2').value = loc.lng();
-    map2.setCenter(loc);
-    marker2.setPosition(loc);
-    marker2.setVisible(true);
+    document.getElementById('lat2').value = place.geometry.location.lat();
+    document.getElementById('lng2').value = place.geometry.location.lng();
   });
 }
 </script>
