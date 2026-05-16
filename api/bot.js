@@ -203,12 +203,49 @@ export default async function handler(req, res) {
     if (isNaN(cant) || cant < 1 || cant > 12) {
       return res.send(twimlResponse(`Por favor ingresá una cantidad válida entre 1 y 12 sifones.`));
     }
-    sesiones[telefono] = { ...sesion, paso: 'elegir_dia', cantidad: cant };
+    sesiones[telefono] = { ...sesion, paso: 'elegir_cuando', cantidad: cant };
     return res.send(twimlResponse(
-      `¿Qué día preferís la entrega?\n\n` +
-      DIAS.map((d,i) => `${i+1}️⃣ ${d}`).join('\n') +
-      `\n\n_Respondé con el número del día_`
+      `¿Cuándo necesitás la entrega?\n\n` +
+      `1️⃣ Lo antes posible\n` +
+      `2️⃣ Programar para otro día\n\n` +
+      `_⚠️ El servicio está sujeto a disponibilidad del repartidor_`
     ));
+  }
+
+  // ════════════════════════════════════
+  // PASO: ELEGIR CUÁNDO
+  // ════════════════════════════════════
+  if (sesion.paso === 'elegir_cuando') {
+    if (msg === '1') {
+      const cantidad = sesion.cantidad;
+      const subtotal = calcularPrecio(cantidad);
+      const total = subtotal + PRECIO_ENVIO;
+      const esCajon = cantidad % SIFONES_POR_CAJON === 0;
+      sesiones[telefono] = { ...sesion, paso: 'confirmar', dia: 'Lo antes posible', horario: 'Express', subtotal, total };
+      return res.send(twimlResponse(
+        `📋 *Resumen de tu pedido*\n\n` +
+        `📍 ${sesion.direccion}\n` +
+        `⚡ Entrega: *Lo antes posible*\n\n` +
+        `🥤 ${cantidad} sifón${cantidad>1?'es':''} ${esCajon?'(cajón completo)':''}\n` +
+        `   ${esCajon?`${cantidad} × ${formatearPrecio(PRECIO_CAJON)}`:`${cantidad} × ${formatearPrecio(PRECIO_SIFON)}`} = *${formatearPrecio(subtotal)}*\n` +
+        `🚴 Envío: *${formatearPrecio(PRECIO_ENVIO)}*\n` +
+        `──────────────────\n` +
+        `💰 *TOTAL: ${formatearPrecio(total)}*\n\n` +
+        `⚠️ _Sujeto a disponibilidad. Te confirmamos a la brevedad._\n\n` +
+        `_El repartidor cobra en efectivo al entregar_\n\n` +
+        `✅ Escribí *SI* para confirmar\n` +
+        `❌ Escribí *NO* para cancelar`
+      ));
+    }
+    if (msg === '2') {
+      sesiones[telefono] = { ...sesion, paso: 'elegir_dia' };
+      return res.send(twimlResponse(
+        `¿Qué día preferís la entrega?\n\n` +
+        DIAS.map((d,i) => `${i+1}️⃣ ${d}`).join('\n') +
+        `\n\n_Respondé con el número del día_`
+      ));
+    }
+    return res.send(twimlResponse(`Respondé *1* para express o *2* para programar.`));
   }
 
   // ════════════════════════════════════
