@@ -108,7 +108,7 @@ textarea { resize:vertical; min-height:90px; }
 .upload-hint { font-size: 0.75rem; color: rgba(255,255,255,0.25); }
 .upload-preview { width: 100%; max-height: 180px; object-fit: contain; border-radius: 4px; }
 
- background:var(--gris); border:1px solid var(--amarillo); font-family:'Barlow',sans-serif; z-index:9999; }
+.pac-container { background:var(--gris); border:1px solid var(--amarillo); font-family:'Barlow',sans-serif; z-index:9999; }
 .pac-item { color:var(--blanco); border-top:1px solid rgba(255,255,255,0.06); padding:0.5rem 1rem; cursor:pointer; }
 .pac-item:hover,.pac-item-selected { background:var(--gris-medio); }
 .pac-item-query { color:var(--amarillo); }
@@ -340,9 +340,28 @@ const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''
 
 let telVerificado = false;
 
+function normalizarTel(raw) {
+  let t = raw.replace(/\s+/g, '').replace(/[^\d+]/g, '');
+  if (!t.startsWith('+')) t = '+51' + t;
+  return t;
+}
+
+function validarTel(raw) {
+  const t = normalizarTel(raw);
+  // Perú: +51 9XXXXXXXX (9 dígitos empezando en 9)
+  // Internacional: mínimo 8 dígitos después del +
+  return /^\+\d{8,15}$/.test(t);
+}
+
 async function enviarOTP() {
-  const tel = $('tel').value.trim();
-  if (tel.length < 7) { $('e-tel').classList.add('on'); return; }
+  const raw = $('tel').value.trim();
+  if (!validarTel(raw)) {
+    $('e-tel').textContent = 'Ingresá un número válido (ej: 951350536 o +51951350536)';
+    $('e-tel').classList.add('on'); return;
+  }
+  // Normalizar y actualizar el campo
+  $('tel').value = normalizarTel(raw);
+  const tel = $('tel').value;
   $('e-tel').classList.remove('on');
   const btn = $('btn-otp');
   btn.textContent = 'Enviando…'; btn.disabled = true;
@@ -450,7 +469,7 @@ function validar(n) {
     const t = $('tipo-doc').value;
     $('e-dni').textContent = t==='DNI'?'DNI debe tener 8 dígitos':'CE debe tener 9 dígitos';
     ok = v('dni', s=>t==='DNI'?/^\d{8}$/.test(s):/^\d{9}$/.test(s),'e-dni') && ok;
-    ok = v('tel', s=>s.length>=7,'e-tel') && ok;
+    ok = v('tel', s=>validarTel(s),'e-tel') && ok;
     if (!telVerificado) { $('e-tel').textContent = 'Debés verificar tu WhatsApp antes de continuar'; $('e-tel').classList.add('on'); ok=false; }
     ok = v('email', s=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s),'e-email') && ok;
     return ok;
