@@ -114,6 +114,11 @@ textarea { resize:vertical; min-height:90px; }
 .pac-item-query { color:var(--amarillo); }
 .pac-matched { color:var(--amarillo); }
 
+.cobertura-ok { background:rgba(0,204,68,0.08); border:1px solid rgba(0,204,68,0.3); border-left:4px solid var(--verde); padding:1.5rem; margin-bottom:2rem; }
+.cobertura-ok h4 { color:var(--verde); font-family:'Barlow Condensed',sans-serif; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.5rem; }
+.cobertura-err { background:rgba(255,51,51,0.08); border:1px solid rgba(255,51,51,0.3); border-left:4px solid var(--rojo); padding:1.5rem; margin-bottom:2rem; display:none; }
+.cobertura-err h4 { color:var(--rojo); font-family:'Barlow Condensed',sans-serif; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.5rem; }
+
 @media(max-width:600px){
   nav{padding:0 1rem;}
   .wrap{padding:2rem 1rem 4rem;}
@@ -135,15 +140,85 @@ textarea { resize:vertical; min-height:90px; }
   </div>
 
   <div class="tabs">
-    <div class="tab on" id="tab-1"><span>01</span>Tus datos</div>
-    <div class="tab" id="tab-2"><span>02</span>Verificación</div>
-    <div class="tab" id="tab-3"><span>03</span>Dirección</div>
-    <div class="tab" id="tab-4"><span>04</span>Términos</div>
+    <div class="tab on" id="tab-1"><span>01</span>Cobertura</div>
+    <div class="tab" id="tab-2"><span>02</span>Términos</div>
+    <div class="tab" id="tab-3"><span>03</span>Tus datos</div>
+    <div class="tab" id="tab-4"><span>04</span>Verificación</div>
     <div class="tab" id="tab-5"><span>05</span>La seña</div>
   </div>
 
-  <!-- PASO 1 -->
+  <!-- PASO 1 — COBERTURA Y DIRECCIÓN -->
   <div class="step on" id="paso-1">
+    <div class="sbox" style="border-left-color:var(--azul)">
+      <h4 style="color:var(--azul)">¿Llegamos a tu zona?</h4>
+      <p>Ingresá tu dirección para verificar si tenemos cobertura en tu barrio antes de continuar.</p>
+    </div>
+
+    <div class="fg">
+      <label>Distrito</label>
+      <div class="dsp" id="dsp-distrito">Se completa automáticamente con la dirección</div>
+      <input type="hidden" id="distrito">
+      <div class="ferr" id="e-distrito">Esta zona no está en nuestra cobertura aún</div>
+    </div>
+
+    <div class="fg">
+      <label>Dirección principal *</label>
+      <input type="text" id="dir1" placeholder="Escribí tu calle y número…" autocomplete="off">
+      <div class="ferr" id="e-dir1">Seleccioná una dirección del listado de Google</div>
+    </div>
+
+    <div class="fg" id="g-dpto1" style="display:none">
+      <label>Piso / Departamento / Referencia</label>
+      <input type="text" id="dpto1" placeholder="Ej: Dpto 4B · Piso 3 · Casa del fondo">
+    </div>
+    <div class="map-box" id="map1"></div>
+    <input type="hidden" id="lat1"><input type="hidden" id="lng1">
+
+    <div id="g-dir2" style="display:none; margin-top:2rem; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,0.06)">
+      <div class="fg"><label>Segunda dirección (opcional)</label><input type="text" id="dir2" placeholder="Otra dirección de entrega…" autocomplete="off"></div>
+      <div class="fg"><label>Piso / Departamento / Referencia</label><input type="text" id="dpto2" placeholder="Ej: Dpto 4B · Piso 3…"></div>
+      <div class="map-box" id="map2"></div>
+      <input type="hidden" id="lat2"><input type="hidden" id="lng2">
+    </div>
+
+    <button class="add-btn" onclick="toggle2()" id="btn-dir2">+ Agregar segunda dirección</button>
+
+    <div class="cobertura-ok" id="cobertura-ok" style="display:none;margin-top:1.5rem">
+      <h4>✅ ¡Tenemos cobertura en tu zona!</h4>
+      <p>Podés continuar con el registro.</p>
+    </div>
+    <div class="cobertura-err" id="cobertura-err">
+      <h4>❌ Sin cobertura por ahora</h4>
+      <p>Lamentablemente aún no llegamos a tu zona. Podés dejarnos tu email y te avisamos cuando habilitemos tu barrio.</p>
+    </div>
+
+    <div class="btnrow"><button class="btn-s" onclick="ir(2)">Siguiente →</button></div>
+  </div>
+
+  <!-- PASO 2 — TÉRMINOS Y CONDICIONES -->
+  <div class="step" id="paso-2">
+    <div class="tyc-box">
+      <h4>Términos y Condiciones — La Sodería ATR</h4>
+      <p><strong>1. El servicio</strong><br>La Sodería ATR provee soda carbonatada en sifones retornables a domicilio en Lima Metropolitana. El cliente no adquiere los sifones ni los cajones en propiedad — los recibe en préstamo bajo depósito (seña).</p>
+      <p><strong>2. La seña (depósito)</strong><br>Al activar su cuenta, el cliente abona una seña de S/ 5 por cada sifón y S/ 20 por cada cajón, resultando en S/ 50 por cajón completo. Esta seña es un depósito en garantía y será devuelta íntegramente al momento de la devolución de los equipos en buen estado.</p>
+      <p><strong>3. Costo real del equipo</strong><br>El valor real de cada sifón es de USD 20 y el cajón USD 80, totalizando USD 200 por cajón. En caso de no devolución, el cliente deberá abonar la diferencia entre la seña y el costo real según el tipo de cambio vigente.</p>
+      <p><strong>4. Regla de inactividad</strong><br>Si el cliente no realiza ningún pedido durante 45 días corridos, La Sodería ATR coordinará la devolución de los equipos y reintegrará la seña en un plazo máximo de 7 días hábiles.</p>
+      <p><strong>5. Pedidos y entregas</strong><br>Los pedidos se realizan por WhatsApp desde el número registrado. El cobro de cada recarga lo realiza el repartidor en efectivo al momento de la entrega.</p>
+      <p><strong>6. Cantidad máxima</strong><br>Sin autorización especial, cada cliente puede tener hasta 2 cajones simultáneamente.</p>
+      <p><strong>7. Cancelación</strong><br>El cliente puede cancelar con 7 días de anticipación, coordinando la devolución y restitución de la seña.</p>
+      <p><strong>8. Protección de datos</strong><br>Los datos son recopilados exclusivamente para la prestación del servicio, en cumplimiento con la Ley N° 29733. No serán utilizados con fines de marketing ni compartidos con terceros sin consentimiento expreso.</p>
+    </div>
+    <div class="ferr" id="e-tyc" style="display:none">Debés aceptar ambas casillas para continuar.</div>
+    <label class="chk"><input type="checkbox" id="chk-tyc"><span>He leído y acepto los <a href="#">Términos y Condiciones</a>, incluyendo la seña, el costo real del equipo y la regla de los 45 días.</span></label>
+    <label class="chk"><input type="checkbox" id="chk-datos"><span>Acepto el tratamiento de mis datos personales conforme a la Ley N° 29733 y confirmo que la información es verídica.</span></label>
+    <div class="btnrow">
+      <button class="btn-a" onclick="ir(1)">← Anterior</button>
+      <button class="btn-s" onclick="ir(3)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 3 — DATOS PERSONALES -->
+  <div class="step" id="paso-3">
     <div class="row2">
       <div class="fg"><label>Nombre *</label><input type="text" id="nombre" placeholder="Juan"><div class="ferr" id="e-nombre">Ingresá tu nombre</div></div>
       <div class="fg"><label>Apellido *</label><input type="text" id="apellido" placeholder="García"><div class="ferr" id="e-apellido">Ingresá tu apellido</div></div>
@@ -160,32 +235,15 @@ textarea { resize:vertical; min-height:90px; }
       <input type="text" id="dni" inputmode="numeric" placeholder="12345678" maxlength="8">
       <div class="ferr" id="e-dni">DNI debe tener 8 dígitos</div>
     </div>
-    <div class="fg"><label>WhatsApp *</label>
-      <div style="display:flex;gap:0.75rem">
-        <input type="tel" id="tel" placeholder="+51 999 999 999" style="flex:1">
-        <button type="button" onclick="enviarOTP()" id="btn-otp" class="btn-s" style="white-space:nowrap;clip-path:none;padding:0 1.2rem;font-size:0.8rem">Enviar código</button>
-      </div>
-      <div class="ferr" id="e-tel">Ingresá tu número</div>
-    </div>
-
-    <div class="fg" id="fg-otp" style="display:none">
-      <label>Código de verificación *</label>
-      <div style="display:flex;gap:0.75rem">
-        <input type="text" id="otp-code" inputmode="numeric" maxlength="6" placeholder="123456" style="flex:1;letter-spacing:0.3em;font-size:1.2rem;text-align:center">
-        <button type="button" onclick="verificarOTP()" id="btn-verificar" class="btn-s" style="white-space:nowrap;clip-path:none;padding:0 1.2rem;font-size:0.8rem">Verificar</button>
-      </div>
-      <div style="font-size:0.78rem;color:rgba(255,255,255,0.35);margin-top:0.4rem">Revisá tu WhatsApp — el código llega en segundos</div>
-      <div class="ferr" id="e-otp">Código incorrecto o expirado</div>
-    </div>
-    <div class="fg" id="fg-tel-ok" style="display:none">
-      <div style="color:var(--verde);font-size:0.85rem;padding:0.5rem 0">✓ Teléfono verificado correctamente</div>
-    </div>
     <div class="fg"><label>Correo electrónico *</label><input type="email" id="email" placeholder="juan@correo.com"><div class="ferr" id="e-email">Ingresá un correo válido</div></div>
-    <div class="btnrow"><button class="btn-s" onclick="ir(2)">Siguiente →</button></div>
-  </div>
+    <div class="fg">
+      <label>WhatsApp *</label>
+      <input type="tel" id="tel" placeholder="+51 999 999 999">
+      <div class="ferr" id="e-tel">Ingresá tu número de WhatsApp</div>
+    </div>
 
-  <!-- PASO 2 — VERIFICACIÓN -->
-  <div class="step" id="paso-2">
+    <!-- Verificación de identidad -->
+    <hr class="sep">
     <div class="sbox" style="border-left-color:var(--azul)">
       <h4 style="color:var(--azul)">¿Por qué verificamos tu identidad?</h4>
       <p>Nuestros cajones valen USD 200 c/u. La verificación protege el equipo y nos permite ofrecerte un mejor servicio.</p>
@@ -223,73 +281,18 @@ textarea { resize:vertical; min-height:90px; }
           <span class="upload-hint">Tu cara y el documento deben verse claramente</span>
         </div>
       </div>
-      <input type="file" id="file-selfie" accept="image/jpeg,image/png" style="display:none" onchange="previewFile('selfie')">
+      <input type="file" id="file-selfie" accept="image/jpeg,image/png" capture="user" style="display:none" onchange="previewFile('selfie')">
       <div class="ferr" id="e-selfie">Subí una selfie sosteniendo tu documento</div>
     </div>
-    <div class="btnrow">
-      <button class="btn-a" onclick="ir(1)">← Anterior</button>
-      <button class="btn-s" onclick="ir(3)">Siguiente →</button>
-    </div>
-  </div>
 
-  <!-- PASO 3 — DIRECCIÓN -->
-  <div class="step" id="paso-3">
-    <div class="fg">
-      <label>Distrito</label>
-      <div class="dsp" id="dsp-distrito">Se completa automáticamente con la dirección</div>
-      <input type="hidden" id="distrito">
-      <div class="ferr" id="e-distrito">Esta zona no está en nuestra cobertura aún</div>
-    </div>
-    <div class="fg">
-      <label>Dirección principal *</label>
-      <input type="text" id="dir1" placeholder="Escribí tu calle y número…" autocomplete="off">
-      <div class="ferr" id="e-dir1">Seleccioná una dirección del listado de Google</div>
-    </div>
-    <div class="fg" id="g-dpto1" style="display:none">
-      <label>Piso / Departamento / Referencia</label>
-      <input type="text" id="dpto1" placeholder="Ej: Dpto 4B · Piso 3 · Casa del fondo">
-    </div>
-    <div class="map-box" id="map1"></div>
-    <input type="hidden" id="lat1"><input type="hidden" id="lng1">
-
-    <div id="g-dir2" style="display:none; margin-top:2rem; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,0.06)">
-      <div class="fg"><label>Segunda dirección (opcional)</label><input type="text" id="dir2" placeholder="Otra dirección de entrega…" autocomplete="off"></div>
-      <div class="fg"><label>Piso / Departamento / Referencia</label><input type="text" id="dpto2" placeholder="Ej: Dpto 4B · Piso 3…"></div>
-      <div class="map-box" id="map2"></div>
-      <input type="hidden" id="lat2"><input type="hidden" id="lng2">
-    </div>
-
-    <button class="add-btn" onclick="toggle2()" id="btn-dir2">+ Agregar segunda dirección</button>
     <div class="btnrow">
       <button class="btn-a" onclick="ir(2)">← Anterior</button>
       <button class="btn-s" onclick="ir(4)">Siguiente →</button>
     </div>
   </div>
 
-  <!-- PASO 4 — TÉRMINOS -->
+  <!-- PASO 4 — PAGO Y VERIFICACIÓN DEL CELULAR -->
   <div class="step" id="paso-4">
-    <div class="tyc-box">
-      <h4>Términos y Condiciones — La Sodería ATR</h4>
-      <p><strong>1. El servicio</strong><br>La Sodería ATR provee soda carbonatada en sifones retornables a domicilio en Lima Metropolitana. El cliente no adquiere los sifones ni los cajones en propiedad — los recibe en préstamo bajo depósito (seña).</p>
-      <p><strong>2. La seña (depósito)</strong><br>Al activar su cuenta, el cliente abona una seña de S/ 5 por cada sifón y S/ 20 por cada cajón, resultando en S/ 50 por cajón completo. Esta seña es un depósito en garantía y será devuelta íntegramente al momento de la devolución de los equipos en buen estado.</p>
-      <p><strong>3. Costo real del equipo</strong><br>El valor real de cada sifón es de USD 20 y el cajón USD 80, totalizando USD 200 por cajón. En caso de no devolución, el cliente deberá abonar la diferencia entre la seña y el costo real según el tipo de cambio vigente.</p>
-      <p><strong>4. Regla de inactividad</strong><br>Si el cliente no realiza ningún pedido durante 45 días corridos, La Sodería ATR coordinará la devolución de los equipos y reintegrará la seña en un plazo máximo de 7 días hábiles.</p>
-      <p><strong>5. Pedidos y entregas</strong><br>Los pedidos se realizan por WhatsApp desde el número registrado. El cobro de cada recarga lo realiza el repartidor en efectivo al momento de la entrega.</p>
-      <p><strong>6. Cantidad máxima</strong><br>Sin autorización especial, cada cliente puede tener hasta 2 cajones simultáneamente.</p>
-      <p><strong>7. Cancelación</strong><br>El cliente puede cancelar con 7 días de anticipación, coordinando la devolución y restitución de la seña.</p>
-      <p><strong>8. Protección de datos</strong><br>Los datos son recopilados exclusivamente para la prestación del servicio, en cumplimiento con la Ley N° 29733. No serán utilizados con fines de marketing ni compartidos con terceros sin consentimiento expreso.</p>
-    </div>
-    <div class="ferr" id="e-tyc" style="display:none">Debés aceptar ambas casillas para continuar.</div>
-    <label class="chk"><input type="checkbox" id="chk-tyc"><span>He leído y acepto los <a href="#">Términos y Condiciones</a>, incluyendo la seña, el costo real del equipo y la regla de los 45 días.</span></label>
-    <label class="chk"><input type="checkbox" id="chk-datos"><span>Acepto el tratamiento de mis datos personales conforme a la Ley N° 29733 y confirmo que la información es verídica.</span></label>
-    <div class="btnrow">
-      <button class="btn-a" onclick="ir(3)">← Anterior</button>
-      <button class="btn-s" onclick="ir(5)">Siguiente →</button>
-    </div>
-  </div>
-
-  <!-- PASO 5 — LA SEÑA -->
-  <div class="step" id="paso-5">
     <div class="sbox"><h4>¿Cuántos cajones querés?</h4><p>Cada cajón trae 6 sifones. Podés tener hasta 2 sin autorización especial.</p></div>
     <div class="fg">
       <label>Cantidad de cajones *</label>
@@ -301,21 +304,62 @@ textarea { resize:vertical; min-height:90px; }
     <div class="sbox"><h4>Total a depositar</h4><span class="smonto" id="monto">S/ 50</span><p id="detalle">1 cajón × S/50 = S/50</p></div>
     <hr class="sep">
     <div class="sbox">
-      <h4>Datos para la transferencia</h4>
-      <p>Realizá la transferencia y anotá el número de operación. Activamos tu cuenta en menos de 24 horas.</p>
+      <h4>Pagá por Yape o Plin</h4>
+      <p>Realizá la transferencia y subí la captura de pantalla como comprobante.</p>
       <div class="tdata">
-        <p><strong>Banco:</strong> BCP</p>
-        <p><strong>Titular:</strong> La Sodería ATR S.A.C.</p>
-        <p><strong>Cuenta corriente:</strong> 000-0000000-0-00</p>
-        <p><strong>CCI:</strong> 00000000000000000000</p>
-        <p><strong>Yape:</strong> +51 999 000 000</p>
+        <p><strong>Yape / Plin:</strong> +51 999 000 000</p>
+        <p><strong>Titular:</strong> La Sodería ATR</p>
       </div>
       <p style="margin-top:0.5rem">⚠️ En el concepto escribí tu <strong>DNI o CE</strong>.</p>
     </div>
-    <div class="fg"><label>Número de operación *</label><input type="text" id="comprobante" placeholder="Ej: 123456789"><div class="ferr" id="e-comp">Ingresá el número de operación</div></div>
+    <div class="fg">
+      <label>Captura del comprobante *</label>
+      <div class="upload-box" id="box-comprobante" onclick="document.getElementById('file-comprobante').click()">
+        <div class="upload-inner" id="prev-comprobante">
+          <div class="upload-ico">📱</div>
+          <span>Subí la captura de Yape o Plin</span>
+          <span class="upload-hint">JPG o PNG · máx. 5MB</span>
+        </div>
+      </div>
+      <input type="file" id="file-comprobante" accept="image/jpeg,image/png" style="display:none" onchange="previewFile('comprobante')">
+      <div class="ferr" id="e-comprobante">Subí la captura del comprobante</div>
+    </div>
+    <div class="fg"><label>Número de operación (opcional)</label><input type="text" id="comprobante" placeholder="Ej: 123456789"></div>
+
+    <hr class="sep">
+
+    <!-- Verificación del celular -->
+    <div class="sbox" style="border-left-color:var(--verde)">
+      <h4 style="color:var(--verde)">Verificá tu WhatsApp</h4>
+      <p>Para cerrar el registro necesitamos confirmar que el número es tuyo.</p>
+    </div>
+
+    <div class="fg">
+      <label>WhatsApp a verificar</label>
+      <div style="display:flex;gap:0.75rem">
+        <div style="flex:1;padding:0.85rem 1rem;background:var(--gris-medio);border:1.5px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:0.95rem" id="tel-display">—</div>
+        <button type="button" onclick="enviarOTP()" id="btn-otp" class="btn-s" style="white-space:nowrap;clip-path:none;padding:0 1.2rem;font-size:0.8rem">Enviar código</button>
+      </div>
+      <div class="ferr" id="e-tel">Debés verificar tu WhatsApp antes de continuar</div>
+    </div>
+
+    <div class="fg" id="fg-otp" style="display:none">
+      <label>Código de verificación *</label>
+      <div style="display:flex;gap:0.75rem">
+        <input type="text" id="otp-code" inputmode="numeric" maxlength="6" placeholder="123456" style="flex:1;letter-spacing:0.3em;font-size:1.2rem;text-align:center">
+        <button type="button" onclick="verificarOTP()" id="btn-verificar" class="btn-s" style="white-space:nowrap;clip-path:none;padding:0 1.2rem;font-size:0.8rem">Verificar</button>
+      </div>
+      <div style="font-size:0.78rem;color:rgba(255,255,255,0.35);margin-top:0.4rem">Revisá tu WhatsApp — el código llega en segundos</div>
+      <div class="ferr" id="e-otp">Código incorrecto o expirado</div>
+    </div>
+    <div class="fg" id="fg-tel-ok" style="display:none">
+      <div style="color:var(--verde);font-size:0.85rem;padding:0.5rem 0">✓ Teléfono verificado correctamente</div>
+    </div>
+
     <div class="fg"><label>Notas adicionales (opcional)</label><textarea id="notas" placeholder="Referencia de dirección, portero, horario preferido…"></textarea></div>
+
     <div class="btnrow">
-      <button class="btn-a" onclick="ir(4)">← Anterior</button>
+      <button class="btn-a" onclick="ir(3)">← Anterior</button>
       <button class="btn-s" id="btn-env" onclick="enviar()">Confirmar registro →</button>
       <div class="spin-wrap" id="spin"><div class="spin"></div><span>Guardando…</span></div>
     </div>
@@ -336,12 +380,13 @@ textarea { resize:vertical; min-height:90px; }
 const sb = supabase.createClient('https://rnyevcqqsjharrncswpl.supabase.co','sb_publishable_LRKrU-Pjchfp7Y1PqBRxWg_11BekgEF');
 let paso = 1, dir1OK = false;
 let ZONAS = [];
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+
 async function cargarZonas() {
   const { data, error } = await sb.from('zonas_cobertura').select('nombre').eq('activo', true);
   if (!error && data) ZONAS = data.map(z => norm(z.nombre));
 }
 cargarZonas();
-const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 
 let telVerificado = false;
 
@@ -353,20 +398,18 @@ function normalizarTel(raw) {
 
 function validarTel(raw) {
   const t = normalizarTel(raw);
-  // Perú: +51 9XXXXXXXX (9 dígitos empezando en 9)
-  // Internacional: mínimo 8 dígitos después del +
   return /^\+\d{8,15}$/.test(t);
 }
 
 async function enviarOTP() {
   const raw = $('tel').value.trim();
   if (!validarTel(raw)) {
-    $('e-tel').textContent = 'Ingresá un número válido (ej: 951350536 o +51951350536)';
+    $('e-tel').textContent = 'Número inválido en el paso anterior';
     $('e-tel').classList.add('on'); return;
   }
-  // Normalizar y actualizar el campo
   $('tel').value = normalizarTel(raw);
   const tel = $('tel').value;
+  $('tel-display').textContent = tel;
   $('e-tel').classList.remove('on');
   const btn = $('btn-otp');
   btn.textContent = 'Enviando…'; btn.disabled = true;
@@ -408,7 +451,6 @@ async function verificarOTP() {
       $('fg-otp').style.display = 'none';
       $('fg-tel-ok').style.display = 'block';
       $('btn-otp').style.display = 'none';
-      $('tel').readOnly = true;
       $('e-otp').classList.remove('on');
     } else {
       $('e-otp').textContent = data.error || 'Código incorrecto';
@@ -419,7 +461,6 @@ async function verificarOTP() {
     alert('Error de conexión.'); btn.textContent = 'Verificar'; btn.disabled = false;
   }
 }
-
 
 function cambiarDoc() {
   const t = $('tipo-doc').value;
@@ -441,6 +482,11 @@ function v(id, fn, eid) {
 
 function ir(n) {
   if (n > paso && !validar(paso)) return;
+  // Al ir al paso 4, mostrar el teléfono en el display
+  if (n === 4) {
+    const tel = normalizarTel($('tel').value.trim());
+    $('tel-display').textContent = tel;
+  }
   $(`paso-${paso}`).classList.remove('on'); $(`tab-${paso}`).classList.remove('on'); $(`tab-${paso}`).classList.add('done');
   paso = n;
   $(`paso-${n}`).classList.add('on'); $(`tab-${n}`).classList.remove('done'); $(`tab-${n}`).classList.add('on');
@@ -469,32 +515,33 @@ function previewFile(tipo) {
 function validar(n) {
   if (n===1) {
     let ok = true;
+    if (!dir1OK) { $('e-dir1').classList.add('on'); $('dir1').classList.add('err'); ok=false; }
+    if (!$('distrito').value) { $('e-distrito').classList.add('on'); ok=false; }
+    return ok;
+  }
+  if (n===2) {
+    const ok = $('chk-tyc').checked && $('chk-datos').checked;
+    $('e-tyc').style.display = ok ? 'none' : 'block';
+    return ok;
+  }
+  if (n===3) {
+    let ok = true;
     ok = v('nombre', s=>s.length>=2,'e-nombre') && ok;
     ok = v('apellido', s=>s.length>=2,'e-apellido') && ok;
     const t = $('tipo-doc').value;
     $('e-dni').textContent = t==='DNI'?'DNI debe tener 8 dígitos':'CE debe tener 9 dígitos';
     ok = v('dni', s=>t==='DNI'?/^\d{8}$/.test(s):/^\d{9}$/.test(s),'e-dni') && ok;
-    ok = v('tel', s=>validarTel(s),'e-tel') && ok;
-    if (!telVerificado) { $('e-tel').textContent = 'Debés verificar tu WhatsApp antes de continuar'; $('e-tel').classList.add('on'); ok=false; }
     ok = v('email', s=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s),'e-email') && ok;
-    return ok;
-  }
-  if (n===2) {
-    let ok = true;
+    ok = v('tel', s=>validarTel(s),'e-tel') && ok;
     if (!$('file-frente').files[0]) { $('e-frente').classList.add('on'); ok=false; }
     if (!$('file-dorso').files[0]) { $('e-dorso').classList.add('on'); ok=false; }
     if (!$('file-selfie').files[0]) { $('e-selfie').classList.add('on'); ok=false; }
     return ok;
   }
-  if (n===3) {
-    let ok = true;
-    if (!dir1OK) { $('e-dir1').classList.add('on'); $('dir1').classList.add('err'); ok=false; }
-    if (!$('distrito').value) { $('e-distrito').classList.add('on'); ok=false; }
-    return ok;
-  }
   if (n===4) {
-    const ok = $('chk-tyc').checked && $('chk-datos').checked;
-    $('e-tyc').style.display = ok ? 'none' : 'block';
+    let ok = true;
+    if (!$('file-comprobante').files[0]) { $('e-comprobante').classList.add('on'); ok=false; }
+    if (!telVerificado) { $('e-tel').textContent = 'Debés verificar tu WhatsApp antes de continuar'; $('e-tel').classList.add('on'); ok=false; }
     return ok;
   }
   return true;
@@ -515,18 +562,28 @@ function calcSena() {
 
 function setDistrito(nombre) {
   const d=$('dsp-distrito'), i=$('distrito'), e=$('e-distrito');
-  const enZona = ZONAS.some(z=>norm(nombre).includes(norm(z)));
+  const normNombre = norm(nombre);
+  const enZona = ZONAS.some(z => normNombre.includes(z) || z.includes(normNombre));
   if (enZona) {
     d.textContent=nombre; d.className='dsp ok'; i.value=nombre; e.classList.remove('on');
+    $('cobertura-ok').style.display='block';
+    $('cobertura-err').style.display='none';
   } else {
     d.textContent=`${nombre} — Sin cobertura aún`; d.className='dsp err'; i.value=''; e.classList.add('on');
+    $('cobertura-ok').style.display='none';
+    $('cobertura-err').style.display='block';
   }
 }
 
 function getDistrito(comps) {
-  // En Perú, el distrito viene como administrative_area_level_3 o locality
-  const orden = ['administrative_area_level_3','locality','sublocality_level_1','sublocality'];
-  for (const tipo of orden) {
+  // Buscar en orden: primero locality (ciudad/distrito en Lima), luego sublocality
+  const prioridad = [
+    'administrative_area_level_3',
+    'locality',
+    'sublocality_level_1',
+    'sublocality'
+  ];
+  for (const tipo of prioridad) {
     const comp = comps.find(c => c.types.includes(tipo));
     if (comp) return comp.long_name;
   }
@@ -534,13 +591,13 @@ function getDistrito(comps) {
 }
 
 async function enviar() {
-  if (!v('comprobante',s=>s.length>=3,'e-comp')) return;
+  if (!$('file-comprobante').files[0]) { $('e-comprobante').classList.add('on'); return; }
+  if (!telVerificado) { $('e-tel').textContent = 'Debés verificar tu WhatsApp antes de continuar'; $('e-tel').classList.add('on'); return; }
   $('btn-env').style.display='none'; $('spin').classList.add('on');
 
   const dni = $('dni').value.trim();
   const folder = `${$('tipo-doc').value}_${dni}_${Date.now()}`;
 
-  // Subir documentos a Storage
   async function subirArchivo(inputId, nombre) {
     const file = $(inputId).files[0];
     if (!file) return null;
@@ -552,10 +609,11 @@ async function enviar() {
   }
 
   try {
-    const [pathFrente, pathDorso, pathSelfie] = await Promise.all([
+    await Promise.all([
       subirArchivo('file-frente', 'frente'),
       subirArchivo('file-dorso', 'dorso'),
-      subirArchivo('file-selfie', 'selfie')
+      subirArchivo('file-selfie', 'selfie'),
+      subirArchivo('file-comprobante', 'comprobante')
     ]);
 
     const d1=$('dir1').value.trim(), dp1=$('dpto1').value.trim();
@@ -577,7 +635,7 @@ async function enviar() {
     const {error} = await sb.from('clientes').insert([data]);
     if (error) throw error;
 
-    $('paso-5').classList.remove('on');
+    $('paso-4').classList.remove('on');
     document.querySelector('.tabs').style.display='none';
     $('exito').style.display='block';
   } catch(err) {
@@ -614,7 +672,10 @@ function initMaps() {
     m1.setCenter(l); m1.setZoom(17); mk1.setPosition(l); mk1.setVisible(true);
     $('dir1').classList.add('ok'); $('e-dir1').classList.remove('on');
     dir1OK=true;
-    const dist=getDistrito(p.address_components); if(dist) setDistrito(dist);
+    const dist=getDistrito(p.address_components);
+    console.log('address_components:', p.address_components);
+    console.log('distrito detectado:', dist);
+    if(dist) setDistrito(dist);
   });
 
   const m2=new google.maps.Map($('map2'),mapCfg);
