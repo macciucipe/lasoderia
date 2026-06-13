@@ -1,13 +1,16 @@
 // api/bot.js — Bot de WhatsApp para La Sodería ATR
-// Recibe mensajes de Twilio y responde según el estado de la conversación
+// Sesiones persistidas en Supabase (tabla: bot_sesiones)
 
 const PRECIO_SIFON = 6.00;
 const PRECIO_CAJON = 5.50; // por sifón cuando es cajón completo (6)
 const PRECIO_ENVIO = 5.00;
 const SIFONES_POR_CAJON = 6;
 
-// Estado de conversaciones en memoria (por teléfono)
-const sesiones = {};
+const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+// ─────────────────────────────────────────────
+// HELPERS GENERALES
+// ─────────────────────────────────────────────
 
 function calcularPrecio(cantidad) {
   if (cantidad % SIFONES_POR_CAJON === 0) {
@@ -23,13 +26,104 @@ function formatearPrecio(n) {
 }
 
 function twimlResponse(mensaje) {
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>${mensaje}</Message>
-</Response>`;
+  // Escapar caracteres XML para evitar romper el TwiML
+  const escapado = mensaje
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n  <Message>${escapado}</Message>\n</Response>`;
 }
 
-const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+// ─────────────────────────────────────────────
+// SUPABASE — cliente HTTP liviano (sin SDK)
+// ─────────────────────────────────────────────
+
+function sb(sbUrl, sbKey) {
+  const headers = {
+    'apikey': sbKey,
+    'Authorization': `Bearer ${sbKey}`,
+    'Content-Type': 'application/json',
+  };
+
+  return {
+    async get(tabla, query = '') {
+      const r = await fetch(`${sbUrl}/rest/v1/${tabla}${query ? '?' + query : ''}`, { headers });
+      if (!r.ok) throw new Error(`GET ${tabla}: ${await r.text()}`);
+      return r.json();
+    },
+    async post(tabla, body, prefer = '') {
+      const h = { ...headers };
+      if (prefer) h['Prefer'] = prefer;
+      const r = await fetch(`${sbUrl}/rest/v1/${tabla}`, {
+        method: 'POST', headers: h, body: JSON.stringify(body),
+      });
+      if (!r.ok) throw new Error(`POST ${tabla}: ${await r.text()}`);
+      return prefer.includes('return=representation') ? r.json() : null;
+    },
+    async patch(tabla, query, body) {
+      const r = await fetch(`${sbUrl}/rest/v1/${tabla}?${query}`, {
+        method: 'PATCH', headers, body: JSON.stringify(body),
+      });
+      if (!r.ok) throw new Error(`PATCH ${tabla}: ${await r.text()}`);
+    },
+    async upsert(tabla, body, onConflict) {
+      const h = { ...headers, 'Prefer': 'resolution=merge-duplicates' };
+      const url = `${sbUrl}/rest/v1/${tabla}${onConflict ? `?on_conflict=${onConflict}` : ''}`;
+      const r = await fetch(url, { method: 'POST', headers: h, body: JSON.stringify(body) });
+      if (!r.ok) throw new Error(`UPSERT ${tabla}: ${await r.text()}`);
+    },
+    async rpc(fn, body) {
+      const r = await fetch(`${sbUrl}/rest/v1/rpc/${fn}`, {
+        method: 'POST', headers, body: JSON.stringify(body),
+      });
+      if (!r.ok) throw new Error(`RPC ${fn}: ${await r.text()}`);
+      return r.json();
+    },
+  };
+}
+
+// ─────────────────────────────────────────────
+// SESIONES EN SUPABASE
+// Tabla: bot_sesiones (telefono TEXT PK, datos JSONB, actualizado_en TIMESTAMPTZ)
+// ─────────────────────────────────────────────
+
+async function getSesion(api, telefono) {
+  const rows = await api.get('bot_sesiones', `telefono=eq.${encodeURIComponent(telefono)}&select=datos`);
+  return rows.length > 0 ? rows[0].datos : { paso: 'menu' };
+}
+
+async function setSesion(api, telefono, datos) {
+  await api.upsert('bot_sesiones', {
+    telefono,
+    datos,
+    actualizado_en: new Date().toISOString(),
+  }, 'telefono');
+}
+
+// ─────────────────────────────────────────────
+// TWILIO — enviar mensaje saliente
+// ─────────────────────────────────────────────
+
+async function enviarMensaje(accountSid, authToken, from, to, body) {
+  const r = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({ From: from, To: to, Body: body }),
+    }
+  );
+  const data = await r.json();
+  if (data.error_code) console.error('Twilio error:', data);
+  return data;
+}
+
+// ─────────────────────────────────────────────
+// HANDLER PRINCIPAL
+// ─────────────────────────────────────────────
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'text/xml');
@@ -39,7 +133,7 @@ export default async function handler(req, res) {
   }
 
   const body = req.body;
-  const telefono = (body.From || '').replace('whatsapp:','').trim();
+  const telefono = (body.From || '').replace('whatsapp:', '').trim();
   const mensaje = (body.Body || '').trim();
 
   if (!telefono) {
@@ -48,22 +142,20 @@ export default async function handler(req, res) {
 
   const sbUrl = process.env.SUPABASE_URL;
   const sbKey = process.env.SUPABASE_SERVICE_KEY;
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const fromWA = process.env.TWILIO_WHATSAPP_FROM;
 
-  // ── Buscar cliente ──
-  const clienteResp = await fetch(
-    `${sbUrl}/rest/v1/rpc/buscar_cliente`,
-    {
-      method: 'POST',
-      headers: {
-        'apikey': sbKey,
-        'Authorization': `Bearer ${sbKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ q: telefono.replace('+','') })
-    }
-  );
-  const clientes = await clienteResp.json();
-  const cliente = Array.isArray(clientes) && clientes.length > 0 ? clientes[0] : null;
+  const api = sb(sbUrl, sbKey);
+
+  // ── Buscar cliente por teléfono ──
+  let cliente = null;
+  try {
+    const clientes = await api.rpc('buscar_cliente', { q: telefono.replace('+', '') });
+    cliente = Array.isArray(clientes) && clientes.length > 0 ? clientes[0] : null;
+  } catch (e) {
+    console.error('Error buscando cliente:', e);
+  }
 
   // ── Cliente no registrado ──
   if (!cliente) {
@@ -75,7 +167,7 @@ export default async function handler(req, res) {
     ));
   }
 
-  // ── Cliente pendiente ──
+  // ── Cliente pendiente de aprobación ──
   if (cliente.estado === 'pendiente') {
     return res.send(twimlResponse(
       `Hola ${cliente.nombre}! 👋\n\n` +
@@ -84,7 +176,7 @@ export default async function handler(req, res) {
     ));
   }
 
-  // ── Cliente inactivo/suspendido ──
+  // ── Cliente suspendido ──
   if (cliente.estado !== 'activo') {
     return res.send(twimlResponse(
       `Hola ${cliente.nombre}! Tu cuenta está suspendida en este momento.\n\n` +
@@ -92,21 +184,21 @@ export default async function handler(req, res) {
     ));
   }
 
-  // ── Sesión del cliente ──
-  if (!sesiones[telefono]) sesiones[telefono] = { paso: 'menu' };
-  const sesion = sesiones[telefono];
+  // ── Cargar sesión desde Supabase ──
+  let sesion = await getSesion(api, telefono);
   const msg = mensaje.toLowerCase().trim();
 
-  // ── Reiniciar en cualquier momento ──
-  if (msg === 'hola' || msg === 'menu' || msg === 'inicio' || msg === '0') {
-    sesiones[telefono] = { paso: 'menu' };
+  // ── Palabras clave para reiniciar desde cualquier punto ──
+  if (['hola', 'menu', 'menú', 'inicio', '0'].includes(msg)) {
+    sesion = { paso: 'menu' };
   }
 
   // ════════════════════════════════════
   // PASO: MENÚ PRINCIPAL
   // ════════════════════════════════════
   if (sesion.paso === 'menu') {
-    sesiones[telefono] = { paso: 'esperando_menu' };
+    const nuevaSesion = { paso: 'esperando_menu' };
+    await setSesion(api, telefono, nuevaSesion);
     return res.send(twimlResponse(
       `¡Hola, *${cliente.nombre}*! 🥤 Bienvenido a *La Sodería ATR*\n\n` +
       `¿Qué necesitás hoy?\n\n` +
@@ -123,13 +215,13 @@ export default async function handler(req, res) {
   if (sesion.paso === 'esperando_menu') {
 
     if (msg === '1') {
-      // Construir lista de direcciones
       const dirs = [];
       if (cliente.direccion_1) dirs.push(cliente.direccion_1);
       if (cliente.direccion_2) dirs.push(cliente.direccion_2);
 
       if (dirs.length === 1) {
-        sesiones[telefono] = { paso: 'elegir_cantidad', direccion: dirs[0], distrito: cliente.distrito };
+        const nuevaSesion = { paso: 'elegir_cantidad', direccion: dirs[0], distrito: cliente.distrito };
+        await setSesion(api, telefono, nuevaSesion);
         return res.send(twimlResponse(
           `📍 Te entregamos en:\n*${dirs[0]}*\n\n` +
           `¿Cuántos sifones necesitás?\n\n` +
@@ -138,19 +230,20 @@ export default async function handler(req, res) {
           `• Cajón completo (6): ${formatearPrecio(PRECIO_CAJON)} c/u\n\n` +
           `_Respondé con la cantidad (ej: 6)_`
         ));
-      } else {
-        let texto = `¿A qué dirección querés el pedido?\n\n`;
-        dirs.forEach((d,i) => texto += `${i+1}️⃣ ${d}\n`);
-        sesiones[telefono] = { paso: 'eligiendo_direccion', dirs, cliente };
-        return res.send(twimlResponse(texto + `\n_Respondé con el número_`));
       }
+
+      // Tiene 2 direcciones — que elija
+      let texto = `¿A qué dirección querés el pedido?\n\n`;
+      dirs.forEach((d, i) => { texto += `${i + 1}️⃣ ${d}\n`; });
+      await setSesion(api, telefono, { paso: 'eligiendo_direccion', dirs });
+      return res.send(twimlResponse(texto + `\n_Respondé con el número_`));
     }
 
     if (msg === '2') {
       const dias = cliente.ultimo_pedido
         ? Math.floor((Date.now() - new Date(cliente.ultimo_pedido)) / 86400000)
         : null;
-      sesiones[telefono] = { paso: 'menu' };
+      await setSesion(api, telefono, { paso: 'menu' });
       return res.send(twimlResponse(
         `📋 *Tu cuenta*\n\n` +
         `👤 ${cliente.nombre} ${cliente.apellido}\n` +
@@ -162,7 +255,7 @@ export default async function handler(req, res) {
     }
 
     if (msg === '3') {
-      sesiones[telefono] = { paso: 'menu' };
+      await setSesion(api, telefono, { paso: 'menu' });
       return res.send(twimlResponse(
         `Te vamos a contactar a la brevedad. 📞\n\n` +
         `También podés escribirnos a *hola@lasoderia.pe*\n\n` +
@@ -184,7 +277,8 @@ export default async function handler(req, res) {
       return res.send(twimlResponse(`Respondé con *1* o *2* según la dirección que querés.`));
     }
     const dir = sesion.dirs[idx];
-    sesiones[telefono] = { ...sesion, paso: 'elegir_cantidad', direccion: dir, distrito: cliente.distrito };
+    const nuevaSesion = { paso: 'elegir_cantidad', direccion: dir, distrito: cliente.distrito };
+    await setSesion(api, telefono, nuevaSesion);
     return res.send(twimlResponse(
       `📍 *${dir}*\n\n` +
       `¿Cuántos sifones necesitás?\n\n` +
@@ -203,7 +297,7 @@ export default async function handler(req, res) {
     if (isNaN(cant) || cant < 1 || cant > 12) {
       return res.send(twimlResponse(`Por favor ingresá una cantidad válida entre 1 y 12 sifones.`));
     }
-    sesiones[telefono] = { ...sesion, paso: 'elegir_cuando', cantidad: cant };
+    await setSesion(api, telefono, { ...sesion, paso: 'elegir_cuando', cantidad: cant });
     return res.send(twimlResponse(
       `¿Cuándo necesitás la entrega?\n\n` +
       `1️⃣ Lo antes posible\n` +
@@ -221,13 +315,13 @@ export default async function handler(req, res) {
       const subtotal = calcularPrecio(cantidad);
       const total = subtotal + PRECIO_ENVIO;
       const esCajon = cantidad % SIFONES_POR_CAJON === 0;
-      sesiones[telefono] = { ...sesion, paso: 'confirmar', dia: 'Lo antes posible', horario: 'Express', subtotal, total };
+      await setSesion(api, telefono, { ...sesion, paso: 'confirmar', dia: 'Lo antes posible', horario: 'Express', subtotal, total });
       return res.send(twimlResponse(
         `📋 *Resumen de tu pedido*\n\n` +
         `📍 ${sesion.direccion}\n` +
         `⚡ Entrega: *Lo antes posible*\n\n` +
-        `🥤 ${cantidad} sifón${cantidad>1?'es':''} ${esCajon?'(cajón completo)':''}\n` +
-        `   ${esCajon?`${cantidad} × ${formatearPrecio(PRECIO_CAJON)}`:`${cantidad} × ${formatearPrecio(PRECIO_SIFON)}`} = *${formatearPrecio(subtotal)}*\n` +
+        `🥤 ${cantidad} sifón${cantidad > 1 ? 'es' : ''} ${esCajon ? '(cajón completo)' : ''}\n` +
+        `   ${esCajon ? `${cantidad} × ${formatearPrecio(PRECIO_CAJON)}` : `${cantidad} × ${formatearPrecio(PRECIO_SIFON)}`} = *${formatearPrecio(subtotal)}*\n` +
         `🚴 Envío: *${formatearPrecio(PRECIO_ENVIO)}*\n` +
         `──────────────────\n` +
         `💰 *TOTAL: ${formatearPrecio(total)}*\n\n` +
@@ -238,10 +332,10 @@ export default async function handler(req, res) {
       ));
     }
     if (msg === '2') {
-      sesiones[telefono] = { ...sesion, paso: 'elegir_dia' };
+      await setSesion(api, telefono, { ...sesion, paso: 'elegir_dia' });
       return res.send(twimlResponse(
         `¿Qué día preferís la entrega?\n\n` +
-        DIAS.map((d,i) => `${i+1}️⃣ ${d}`).join('\n') +
+        DIAS.map((d, i) => `${i + 1}️⃣ ${d}`).join('\n') +
         `\n\n_Respondé con el número del día_`
       ));
     }
@@ -256,11 +350,11 @@ export default async function handler(req, res) {
     if (isNaN(idx) || idx < 0 || idx >= DIAS.length) {
       return res.send(twimlResponse(`Respondé con un número del 1 al ${DIAS.length}.`));
     }
-    sesiones[telefono] = { ...sesion, paso: 'elegir_horario', dia: DIAS[idx] };
+    await setSesion(api, telefono, { ...sesion, paso: 'elegir_horario', dia: DIAS[idx] });
     return res.send(twimlResponse(
       `¿En qué horario?\n\n` +
       `1️⃣ 🌅 Mañana (9:00 - 12:00)\n` +
-      `2️⃣ ☀️ Tarde (12:00 - 18:00)\n\n` +
+      `2️⃣ ☀️  Tarde (12:00 - 18:00)\n\n` +
       `_Respondé con 1 o 2_`
     ));
   }
@@ -274,21 +368,18 @@ export default async function handler(req, res) {
     if (isNaN(idx) || idx < 0 || idx > 1) {
       return res.send(twimlResponse(`Respondé con *1* para Mañana o *2* para Tarde.`));
     }
-
     const horario = horarios[idx];
     const cantidad = sesion.cantidad;
     const subtotal = calcularPrecio(cantidad);
     const total = subtotal + PRECIO_ENVIO;
     const esCajon = cantidad % SIFONES_POR_CAJON === 0;
-
-    sesiones[telefono] = { ...sesion, paso: 'confirmar', horario, subtotal, total };
-
+    await setSesion(api, telefono, { ...sesion, paso: 'confirmar', horario, subtotal, total });
     return res.send(twimlResponse(
       `📋 *Resumen de tu pedido*\n\n` +
       `📍 ${sesion.direccion}\n` +
       `📅 ${sesion.dia} · ${horario}\n\n` +
-      `🥤 ${cantidad} sifón${cantidad>1?'es':''} ${esCajon?'(cajón completo)':''}\n` +
-      `   ${esCajon?`${cantidad} × ${formatearPrecio(PRECIO_CAJON)}`:`${cantidad} × ${formatearPrecio(PRECIO_SIFON)}`} = *${formatearPrecio(subtotal)}*\n` +
+      `🥤 ${cantidad} sifón${cantidad > 1 ? 'es' : ''} ${esCajon ? '(cajón completo)' : ''}\n` +
+      `   ${esCajon ? `${cantidad} × ${formatearPrecio(PRECIO_CAJON)}` : `${cantidad} × ${formatearPrecio(PRECIO_SIFON)}`} = *${formatearPrecio(subtotal)}*\n` +
       `🚴 Envío: *${formatearPrecio(PRECIO_ENVIO)}*\n` +
       `──────────────────\n` +
       `💰 *TOTAL: ${formatearPrecio(total)}*\n\n` +
@@ -302,56 +393,48 @@ export default async function handler(req, res) {
   // PASO: CONFIRMAR PEDIDO
   // ════════════════════════════════════
   if (sesion.paso === 'confirmar') {
+
     if (msg === 'si' || msg === 'sí' || msg === 's') {
 
-      // Buscar repartidor por zona
-      const zonasResp = await fetch(`${sbUrl}/rest/v1/zonas_reparto?activo=eq.true&select=*,repartidores(*)`, {
-        headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` }
-      });
-      const zonas = await zonasResp.json();
-
+      // Buscar repartidor asignado a la zona
       let repartidorAsignado = null;
-      if (zonas && zonas.length > 0 && cliente.latitud && cliente.longitud) {
-        repartidorAsignado = zonas[0].repartidores; // Por ahora toma el primero
-      } else if (zonas && zonas.length > 0) {
-        repartidorAsignado = zonas[0].repartidores;
+      try {
+        const zonas = await api.get(
+          'zonas_reparto',
+          `activo=eq.true&select=*,repartidores(*)`
+        );
+        if (zonas && zonas.length > 0) {
+          repartidorAsignado = zonas[0].repartidores;
+        }
+      } catch (e) {
+        console.error('Error buscando repartidor:', e);
       }
 
-      // Guardar pedido en Supabase
-      const pedido = {
-        cliente_id: cliente.id,
-        repartidor_id: repartidorAsignado?.id || null,
-        direccion_entrega: sesion.direccion,
-        distrito: sesion.distrito || cliente.distrito,
-        estado: 'confirmado',
-        monto_cobrado: sesion.total,
-        tipo_venta: 'delivery',
-        notas: `Día: ${sesion.dia}. Horario: ${sesion.horario}. Sifones: ${sesion.cantidad}.`
-      };
+      // Guardar pedido
+      try {
+        await api.post('pedidos', {
+          cliente_id: cliente.id,
+          repartidor_id: repartidorAsignado?.id || null,
+          direccion_entrega: sesion.direccion,
+          distrito: sesion.distrito || cliente.distrito,
+          estado: 'confirmado',
+          monto_cobrado: sesion.total,
+          tipo_venta: 'delivery',
+          notas: `Día: ${sesion.dia}. Horario: ${sesion.horario}. Sifones: ${sesion.cantidad}.`,
+        }, 'return=minimal');
 
-      await fetch(`${sbUrl}/rest/v1/pedidos`, {
-        method: 'POST',
-        headers: {
-          'apikey': sbKey,
-          'Authorization': `Bearer ${sbKey}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(pedido)
-      });
+        // Actualizar último pedido del cliente
+        await api.patch('clientes', `id=eq.${cliente.id}`, {
+          ultimo_pedido: new Date().toISOString(),
+        });
+      } catch (e) {
+        console.error('Error guardando pedido:', e);
+        return res.send(twimlResponse(
+          `Hubo un problema al guardar tu pedido. Por favor escribinos a *hola@lasoderia.pe* o intentá de nuevo con *menu*. 🙏`
+        ));
+      }
 
-      // Actualizar último pedido del cliente
-      await fetch(`${sbUrl}/rest/v1/clientes?id=eq.${cliente.id}`, {
-        method: 'PATCH',
-        headers: {
-          'apikey': sbKey,
-          'Authorization': `Bearer ${sbKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ ultimo_pedido: new Date().toISOString() })
-      });
-
-      // Notificar al repartidor por WhatsApp
+      // Notificar al repartidor
       if (repartidorAsignado?.telefono) {
         const msgRepartidor =
           `🥤 *NUEVO PEDIDO — La Sodería ATR*\n\n` +
@@ -363,28 +446,12 @@ export default async function handler(req, res) {
           `💰 Cobrar: *${formatearPrecio(sesion.total)}*\n` +
           `   (incluye envío ${formatearPrecio(PRECIO_ENVIO)})`;
 
-        const accountSid = process.env.TWILIO_ACCOUNT_SID;
-        const authToken = process.env.TWILIO_AUTH_TOKEN;
-        const from = process.env.TWILIO_WHATSAPP_FROM;
-
-        await fetch(
-          `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-              From: from,
-              To: `whatsapp:${repartidorAsignado.telefono}`,
-              Body: msgRepartidor
-            })
-          }
+        await enviarMensaje(accountSid, authToken, fromWA, `whatsapp:${repartidorAsignado.telefono}`, msgRepartidor).catch(e =>
+          console.error('Error notificando repartidor:', e)
         );
       }
 
-      sesiones[telefono] = { paso: 'menu' };
+      await setSesion(api, telefono, { paso: 'menu' });
       return res.send(twimlResponse(
         `✅ *¡Pedido confirmado!*\n\n` +
         `📅 ${sesion.dia} · ${sesion.horario}\n` +
@@ -396,7 +463,7 @@ export default async function handler(req, res) {
     }
 
     if (msg === 'no' || msg === 'n') {
-      sesiones[telefono] = { paso: 'menu' };
+      await setSesion(api, telefono, { paso: 'menu' });
       return res.send(twimlResponse(
         `Pedido cancelado. ❌\n\nEscribí *menu* cuando quieras hacer un pedido.`
       ));
@@ -406,7 +473,7 @@ export default async function handler(req, res) {
   }
 
   // ── Fallback ──
-  sesiones[telefono] = { paso: 'menu' };
+  await setSesion(api, telefono, { paso: 'menu' });
   return res.send(twimlResponse(
     `Hola ${cliente.nombre}! 👋\n\nEscribí *menu* para ver las opciones.`
   ));

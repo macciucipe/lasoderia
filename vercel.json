@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "functions": {
+    "api/bot.js":        { "maxDuration": 15 },
+    "api/send-otp.js":   { "maxDuration": 10 },
+    "api/verify-otp.js": { "maxDuration": 10 }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    }
+  ]
+}
