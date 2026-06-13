@@ -335,7 +335,12 @@ textarea { resize:vertical; min-height:90px; }
 <script>
 const sb = supabase.createClient('https://rnyevcqqsjharrncswpl.supabase.co','sb_publishable_LRKrU-Pjchfp7Y1PqBRxWg_11BekgEF');
 let paso = 1, dir1OK = false;
-const ZONAS = ['miraflores','san isidro','barranco','santiago de surco','surco','la molina','san borja','jesús maría','jesus maria','lince','pueblo libre','magdalena del mar','magdalena','san miguel','chorrillos'];
+let ZONAS = [];
+async function cargarZonas() {
+  const { data, error } = await sb.from('zonas_cobertura').select('nombre').eq('activo', true);
+  if (!error && data) ZONAS = data.map(z => norm(z.nombre));
+}
+cargarZonas();
 const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 
 let telVerificado = false;
