@@ -524,8 +524,11 @@ function setDistrito(nombre) {
 }
 
 function getDistrito(comps) {
-  for (const c of comps) {
-    if (c.types.includes('sublocality_level_1')||c.types.includes('sublocality')||c.types.includes('locality')) return c.long_name;
+  // En Perú, el distrito viene como administrative_area_level_3 o locality
+  const orden = ['administrative_area_level_3','locality','sublocality_level_1','sublocality'];
+  for (const tipo of orden) {
+    const comp = comps.find(c => c.types.includes(tipo));
+    if (comp) return comp.long_name;
   }
   return null;
 }
