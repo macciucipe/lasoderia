@@ -596,14 +596,14 @@ async function enviar() {
   $('btn-env').style.display='none'; $('spin').classList.add('on');
 
   const dni = $('dni').value.trim();
-  const folder = `${$('tipo-doc').value}_${dni}_${Date.now()}`;
+  const folder = `${$('tipo-doc').value}_${dni}`;
 
   async function subirArchivo(inputId, nombre) {
     const file = $(inputId).files[0];
     if (!file) return null;
     const ext = file.name.split('.').pop();
     const path = `${folder}/${nombre}.${ext}`;
-    const { error } = await sb.storage.from('documentos-clientes').upload(path, file);
+    const { error } = await sb.storage.from('documentos-clientes').upload(path, file, { upsert: true });
     if (error) throw error;
     return path;
   }

@@ -78,6 +78,7 @@ tr:last-child td{border-bottom:none;}
 .badge.activo{background:rgba(0,204,68,0.15);color:var(--verde);}
 .badge.pendiente{background:rgba(255,192,0,0.15);color:var(--amarillo);}
 .badge.inactivo,.badge.suspendido{background:rgba(255,51,51,0.15);color:var(--rojo);}
+.badge.datos_aprobados{background:rgba(0,0,255,0.15);color:#6699ff;}
 .badge.entregado{background:rgba(0,204,68,0.15);color:var(--verde);}
 .badge.confirmado{background:rgba(255,192,0,0.15);color:var(--amarillo);}
 .badge.directa{background:rgba(0,0,255,0.15);color:#6688ff;}
@@ -575,8 +576,15 @@ async function verCliente(id){
   if(!c) return;
   $('modal-nombre').textContent=`${c.nombre} ${c.apellido}`;
 
-  // Buscar documentos en storage
-  const {data:docs} = await sb.storage.from('documentos-clientes').list(`${c.dni?.split(': ')[1]||c.dni}`,{limit:10});
+  // Extraer carpeta de los docs desde las notas
+  const carpeta = c.notas?.match(/Docs: ([^\s.]+)/)?.[1] || '';
+
+  // Buscar documentos en storage usando la carpeta correcta
+  let docs = [];
+  if(carpeta){
+    const {data} = await sb.storage.from('documentos-clientes').list(carpeta, {limit:20});
+    docs = data || [];
+  }
 
   // Buscar pedidos del cliente
   const {data:pedidos} = await sb.from('pedidos').select('*').eq('cliente_id',id).order('created_at',{ascending:false}).limit(5);
@@ -589,7 +597,7 @@ async function verCliente(id){
       <div class="info-item"><label>Distrito</label><span>${c.distrito}</span></div>
       <div class="info-item"><label>Dirección</label><span>${c.direccion_1||'—'}</span></div>
       <div class="info-item"><label>Cajones asignados</label><span>${c.cajones_asignados||0}</span></div>
-      <div class="info-item"><label>Seña pagada</label><span>${c.sena_pagada?'Sí ✓':'No'}</span></div>
+      <div class="info-item"><label>Seña pagada</label><span id="sena-estado">${c.sena_pagada?'Sí ✓':'No ✗'}</span></div>
       <div class="info-item"><label>Estado</label><span><span class="badge ${c.estado}">${c.estado}</span></span></div>
       <div class="info-item"><label>Registrado</label><span>${formatFecha(c.created_at)}</span></div>
       <div class="info-item"><label>Último pedido</label><span>${c.ultimo_pedido?`${diasDesde(c.ultimo_pedido)} días atrás`:'Sin pedidos'}</span></div>
@@ -599,10 +607,13 @@ async function verCliente(id){
 
     <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:0.75rem">Documentos de identidad</div>
     <div class="docs-grid" id="docs-grid">
-      <div style="text-align:center"><div class="doc-img" id="doc-frente"><span>Cargando…</span></div><div class="doc-label">Frente</div></div>
-      <div style="text-align:center"><div class="doc-img" id="doc-dorso"><span>Sin doc.</span></div><div class="doc-label">Dorso</div></div>
+      <div style="text-align:center"><div class="doc-img" id="doc-frente"><span>Sin doc.</span></div><div class="doc-label">Frente DNI</div></div>
+      <div style="text-align:center"><div class="doc-img" id="doc-dorso"><span>Sin doc.</span></div><div class="doc-label">Dorso DNI</div></div>
       <div style="text-align:center"><div class="doc-img" id="doc-selfie"><span>Sin selfie</span></div><div class="doc-label">Selfie</div></div>
     </div>
+
+    <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin:1rem 0 0.75rem">Comprobante de pago</div>
+    <div id="doc-comprobante" style="background:var(--gris-medio);border:1px solid rgba(255,255,255,0.08);padding:1rem;text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem">Sin comprobante</div>
 
     ${pedidos&&pedidos.length>0?`
     <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin:1rem 0 0.75rem">Últimos pedidos</div>
@@ -611,29 +622,52 @@ async function verCliente(id){
       <tbody>${pedidos.map(p=>`<tr><td>${formatFecha(p.created_at)}</td><td>S/${parseFloat(p.monto_cobrado||0).toFixed(0)}</td><td><span class="badge ${p.estado}">${p.estado}</span></td></tr>`).join('')}</tbody>
     </table>`:''}
 
-    <div class="modal-actions">
-      ${c.estado==='pendiente'?`<button class="btn-p" onclick="cambiarEstado('${c.id}','activo');cerrarModal()">✓ Aprobar cliente</button>`:''}
+    <div class="modal-actions" style="display:flex;flex-wrap:wrap;gap:0.75rem">
+      ${!c.sena_pagada?`<button class="btn-p" style="background:var(--verde);color:var(--negro)" onclick="marcarSena('${c.id}')">💰 Confirmar seña</button>`:'<span style="color:var(--verde);font-size:0.85rem;padding:0.5rem 0">💰 Seña confirmada ✓</span>'}
+      ${c.estado==='pendiente'?`<button class="btn-p" onclick="aprobarDatos('${c.id}')">📋 Aprobar datos</button>`:''}
+      ${c.estado==='datos_aprobados'?`<button class="btn-p" onclick="cambiarEstado('${c.id}','activo');cerrarModal()">✓ Activar cuenta</button>`:''}
       ${c.estado==='activo'?`<button class="btn-p" style="background:var(--rojo);color:var(--blanco)" onclick="cambiarEstado('${c.id}','inactivo');cerrarModal()">Suspender</button>`:''}
       ${c.estado==='inactivo'?`<button class="btn-p" onclick="cambiarEstado('${c.id}','activo');cerrarModal()">Reactivar</button>`:''}
     </div>
   `;
 
-  // Cargar documentos
-  if(docs && docs.length>0){
-    const tipos=['frente','dorso','selfie'];
+  // Cargar documentos desde la carpeta correcta
+  if(docs.length > 0){
+    const tipos = ['frente','dorso','selfie','comprobante'];
     for(const tipo of tipos){
-      const archivo = docs.find(d=>d.name.startsWith(tipo));
+      const archivo = docs.find(d => d.name.startsWith(tipo));
       if(archivo){
-        const carpeta = c.notas?.match(/Docs: ([^\s.]+)/)?.[1]||'';
         const {data:url} = sb.storage.from('documentos-clientes').getPublicUrl(`${carpeta}/${archivo.name}`);
-        if(url){
-          $(`doc-${tipo}`).innerHTML=`<img src="${url.publicUrl}" alt="${tipo}">`;
+        if(url?.publicUrl){
+          if(tipo === 'comprobante'){
+            $('doc-comprobante').innerHTML = `<a href="${url.publicUrl}" target="_blank"><img src="${url.publicUrl}" alt="comprobante" style="max-width:100%;max-height:300px;object-fit:contain"></a>`;
+          } else {
+            $(`doc-${tipo}`).innerHTML = `<a href="${url.publicUrl}" target="_blank"><img src="${url.publicUrl}" alt="${tipo}"></a>`;
+          }
         }
       }
     }
   }
 
   $('modal-cliente').classList.add('open');
+}
+
+async function aprobarDatos(id){
+  const {error} = await sb.from('clientes').update({estado:'datos_aprobados'}).eq('id',id);
+  if(error){ toast('Error al actualizar', 'err'); return; }
+  const c = todosClientes.find(x=>x.id===id);
+  if(c) c.estado = 'datos_aprobados';
+  toast('Datos aprobados');
+  verCliente(id);
+}
+
+async function marcarSena(id){
+  const {error} = await sb.from('clientes').update({sena_pagada:true}).eq('id',id);
+  if(error){ toast('Error al actualizar', 'err'); return; }
+  const c = todosClientes.find(x=>x.id===id);
+  if(c) c.sena_pagada = true;
+  $('sena-estado').textContent = 'Sí ✓';
+  toast('Seña marcada como pagada');
 }
 
 function cerrarModal(){ $('modal-cliente').classList.remove('open'); }
