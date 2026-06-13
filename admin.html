@@ -201,6 +201,10 @@ input:focus,select:focus{border-color:var(--amarillo);}
       <span class="ico">⚠️</span> Alertas 45 días
       <span class="sb-badge" id="badge-alertas" style="display:none">0</span>
     </div>
+    <div class="sb-section">Configuración</div>
+    <div class="sb-item" onclick="navTo('zonas')">
+      <span class="ico">🗺️</span> Zonas de cobertura
+    </div>
   </nav>
   <div class="sb-footer">
     <p id="admin-user">Admin</p>
@@ -414,12 +418,13 @@ function navTo(section){
   event.currentTarget.classList.add('active');
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(`screen-${section}`).classList.add('active');
-  const titles={dashboard:'Dashboard',clientes:'Clientes',pedidos:'Pedidos',repartidores:'Repartidores',alertas:'Alertas 45 días'};
+  const titles={dashboard:'Dashboard',clientes:'Clientes',pedidos:'Pedidos',repartidores:'Repartidores',alertas:'Alertas 45 días',zonas:'Zonas de cobertura'};
   $('page-title').textContent=titles[section]||section;
   if(section==='clientes') cargarClientes();
   if(section==='pedidos') cargarPedidos('hoy');
   if(section==='repartidores') cargarRepartidores();
   if(section==='alertas') cargarAlertas();
+  if(section==='zonas') cargarZonas();
 }
 
 // ── Dashboard ──
@@ -675,6 +680,46 @@ async function cargarAlertas(){
     
   // Cargar clientes para el modal
   if(!todosClientes.length){ const {data:todos}=await sb.from('clientes').select('*'); todosClientes=todos||[]; }
+}
+
+// ─── ZONAS ───
+async function cargarZonas() {
+  const { data, error } = await sb.from('zonas_cobertura').select('*').order('nombre');
+  if (error) { $('zonas-list').innerHTML = '<p style="color:var(--rojo);padding:1rem">Error cargando zonas</p>'; return; }
+  
+  $('zonas-list').innerHTML = data.map(z => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+      <div style="display:flex;align-items:center;gap:1rem">
+        <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+          <input type="checkbox" ${z.activo ? 'checked' : ''} onchange="toggleZona('${z.id}', this.checked)"
+            style="opacity:0;width:0;height:0;position:absolute">
+          <span style="position:absolute;inset:0;background:${z.activo ? 'var(--verde)' : 'rgba(255,255,255,0.1)'};border-radius:24px;transition:0.2s"></span>
+          <span style="position:absolute;top:3px;left:${z.activo ? '23px' : '3px'};width:18px;height:18px;background:#fff;border-radius:50%;transition:0.2s"></span>
+        </label>
+        <span style="font-size:0.95rem;color:${z.activo ? 'var(--blanco)' : 'rgba(255,255,255,0.3)'}">${z.nombre}</span>
+      </div>
+      <button onclick="eliminarZona('${z.id}', '${z.nombre}')" style="background:none;border:none;color:rgba(255,51,51,0.4);cursor:pointer;font-size:1.1rem;padding:0.2rem 0.5rem" title="Eliminar">✕</button>
+    </div>
+  `).join('') || '<p style="color:rgba(255,255,255,0.3);padding:1rem">No hay zonas cargadas</p>';
+}
+
+async function toggleZona(id, activo) {
+  await sb.from('zonas_cobertura').update({ activo }).eq('id', id);
+  cargarZonas();
+}
+
+async function eliminarZona(id, nombre) {
+  if (!confirm(`¿Eliminar la zona "${nombre}"?`)) return;
+  await sb.from('zonas_cobertura').delete().eq('id', id);
+  cargarZonas();
+}
+
+async function agregarZona() {
+  const nombre = prompt('Nombre del distrito:');
+  if (!nombre || !nombre.trim()) return;
+  const { error } = await sb.from('zonas_cobertura').insert([{ nombre: nombre.trim(), activo: true }]);
+  if (error) { alert(error.message.includes('unique') ? 'Esa zona ya existe.' : 'Error al agregar zona.'); return; }
+  cargarZonas();
 }
 </script>
 </body>
