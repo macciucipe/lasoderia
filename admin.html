@@ -344,10 +344,22 @@ input:focus,select:focus{border-color:var(--amarillo);}
 
     <!-- ZONAS -->
     <div id="screen-zonas" class="screen">
+      <div class="table-wrap" style="margin-bottom:1.5rem">
+        <div class="table-header">
+          <h3>➕ Agregar zona</h3>
+        </div>
+        <div style="padding:1.5rem;display:flex;gap:1rem;align-items:flex-end">
+          <div style="flex:1">
+            <label style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);display:block;margin-bottom:0.5rem">Buscar distrito en Lima</label>
+            <input type="text" id="zona-input" placeholder="Ej: Miraflores, San Isidro..."
+              style="width:100%;padding:0.85rem 1rem;background:#1a1a1a;border:1.5px solid rgba(255,255,255,0.1);color:#fff;font-family:Barlow,sans-serif;font-size:0.95rem;outline:none">
+          </div>
+          <button class="filter-btn" onclick="confirmarZona()" style="padding:0.85rem 1.5rem;white-space:nowrap">+ Agregar</button>
+        </div>
+      </div>
       <div class="table-wrap">
         <div class="table-header">
           <h3>🗺️ Zonas de cobertura</h3>
-          <button class="filter-btn" onclick="agregarZona()">+ Nueva zona</button>
         </div>
         <div id="zonas-list" style="padding:1.5rem">
           <div class="spin-wrap on"><div class="spin"></div></div>
@@ -727,13 +739,44 @@ async function eliminarZona(id, nombre) {
   cargarZonas();
 }
 
-async function agregarZona() {
-  const nombre = prompt('Nombre del distrito:');
-  if (!nombre || !nombre.trim()) return;
-  const { error } = await sb.from('zonas_cobertura').insert([{ nombre: nombre.trim(), activo: true }]);
-  if (error) { alert(error.message.includes('unique') ? 'Esa zona ya existe.' : 'Error al agregar zona.'); return; }
+async function agregarZona() {}
+
+async function confirmarZona() {
+  const nombre = document.getElementById('zona-input').value.trim();
+  if (!nombre) { toast('Ingresá un distrito', 'err'); return; }
+  const { error } = await sb.from('zonas_cobertura').insert([{ nombre, activo: true }]);
+  if (error) {
+    toast(error.message.includes('unique') ? 'Esa zona ya existe.' : 'Error al agregar zona.', 'err');
+    return;
+  }
+  document.getElementById('zona-input').value = '';
   cargarZonas();
+  toast('Zona agregada correctamente');
+}
+
+function initZonaMaps() {
+  const bounds = new google.maps.LatLngBounds(
+    new google.maps.LatLng(-12.20, -77.15),
+    new google.maps.LatLng(-11.90, -76.90)
+  );
+  const ac = new google.maps.places.Autocomplete(document.getElementById('zona-input'), {
+    componentRestrictions: { country: 'pe' },
+    fields: ['name', 'address_components'],
+    types: ['(regions)'],
+    bounds
+  });
+  ac.addListener('place_changed', () => {
+    const place = ac.getPlace();
+    if (!place) return;
+    // Extraer nombre del distrito
+    const comp = place.address_components?.find(c =>
+      c.types.includes('sublocality_level_1') || c.types.includes('locality')
+    );
+    if (comp) document.getElementById('zona-input').value = comp.long_name;
+    else if (place.name) document.getElementById('zona-input').value = place.name;
+  });
 }
 </script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD66G-YiES-EmpwZuyg5ObiDlN8amBAnlM&libraries=places&callback=initZonaMaps" async defer></script>
 </body>
 </html>
