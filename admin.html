@@ -449,7 +449,17 @@ function navTo(section){
   if(section==='pedidos') cargarPedidos('hoy');
   if(section==='repartidores') cargarRepartidores();
   if(section==='alertas') cargarAlertas();
-  if(section==='zonas') cargarZonas();
+  if(section==='zonas') {
+    cargarZonas();
+    if (!window.zonaMapsLoaded) {
+      window.zonaMapsLoaded = true;
+      const s = document.createElement('script');
+      s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD66G-YiES-EmpwZuyg5ObiDlN8amBAnlM&libraries=places&callback=initZonaMaps';
+      document.head.appendChild(s);
+    } else if (window.initZonaMaps) {
+      initZonaMaps();
+    }
+  }
 }
 
 // ── Dashboard ──
@@ -762,21 +772,21 @@ function initZonaMaps() {
   const ac = new google.maps.places.Autocomplete(document.getElementById('zona-input'), {
     componentRestrictions: { country: 'pe' },
     fields: ['name', 'address_components'],
-    types: ['(regions)'],
+    types: ['(cities)'],
     bounds
   });
   ac.addListener('place_changed', () => {
     const place = ac.getPlace();
     if (!place) return;
-    // Extraer nombre del distrito
     const comp = place.address_components?.find(c =>
-      c.types.includes('sublocality_level_1') || c.types.includes('locality')
+      c.types.includes('sublocality_level_1') ||
+      c.types.includes('sublocality') ||
+      c.types.includes('locality')
     );
-    if (comp) document.getElementById('zona-input').value = comp.long_name;
-    else if (place.name) document.getElementById('zona-input').value = place.name;
+    const nombre = comp ? comp.long_name : place.name;
+    if (nombre) document.getElementById('zona-input').value = nombre;
   });
 }
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD66G-YiES-EmpwZuyg5ObiDlN8amBAnlM&libraries=places&callback=initZonaMaps" async defer></script>
 </body>
 </html>
