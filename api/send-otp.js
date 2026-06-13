@@ -34,11 +34,11 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Error guardando código' });
   }
 
-  // Enviar por WhatsApp
+  // Enviar por WhatsApp usando template de autenticación
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const from = process.env.TWILIO_WHATSAPP_FROM;
-  const body = `🥤 *La Sodería ATR*\n\nTu código de verificación es:\n\n*${codigo}*\n\nVálido por 10 minutos. No lo compartas con nadie.`;
+  const contentSid = 'HX45e4bc91c367485707b9e956ab13cdbc';
 
   const response = await fetch(
     `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
@@ -48,12 +48,18 @@ export default async function handler(req, res) {
         'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({ From: from, To: `whatsapp:${numWA}`, Body: body }),
+      body: new URLSearchParams({
+        From: from,
+        To: `whatsapp:${numWA}`,
+        ContentSid: contentSid,
+        ContentVariables: JSON.stringify({ 1: codigo }),
+      }),
     }
   );
 
   const data = await response.json();
   if (data.error_code) {
+    console.error('Twilio error:', data);
     return res.status(400).json({ error: 'No se pudo enviar el mensaje. Verificá el número.' });
   }
 
