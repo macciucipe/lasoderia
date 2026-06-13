@@ -38,7 +38,7 @@ export default async function handler(req, res) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const from = process.env.TWILIO_WHATSAPP_FROM;
-  const contentSid = 'HX45e4bc91c367485707b9e956ab13cdbc';
+  const contentSid = process.env.TWILIO_OTP_TEMPLATE_SID;
 
   const response = await fetch(
     `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
