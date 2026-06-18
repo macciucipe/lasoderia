@@ -140,15 +140,33 @@ textarea { resize:vertical; min-height:90px; }
   </div>
 
   <div class="tabs">
-    <div class="tab on" id="tab-1"><span>01</span>Cobertura</div>
-    <div class="tab" id="tab-2"><span>02</span>Términos</div>
-    <div class="tab" id="tab-3"><span>03</span>Tus datos</div>
-    <div class="tab" id="tab-4"><span>04</span>Verificación</div>
-    <div class="tab" id="tab-5"><span>05</span>La seña</div>
+    <div class="tab on" id="tab-1"><span>01</span>Invitación</div>
+    <div class="tab" id="tab-2"><span>02</span>Dirección</div>
+    <div class="tab" id="tab-3"><span>03</span>Términos</div>
+    <div class="tab" id="tab-4"><span>04</span>Tus datos</div>
+    <div class="tab" id="tab-5"><span>05</span>Seña y verificación</div>
   </div>
 
-  <!-- PASO 1 — COBERTURA Y DIRECCIÓN -->
+  <!-- PASO 1 — CÓDIGO DE INVITACIÓN -->
   <div class="step on" id="paso-1">
+    <div class="sbox" style="border-left-color:var(--amarillo)">
+      <h4>Acceso por invitación</h4>
+      <p>Por ahora el servicio es solo para clientes invitados. Ingresá el código que recibiste para continuar.</p>
+    </div>
+    <div class="fg">
+      <label>Código de invitación *</label>
+      <div style="display:flex;gap:0.75rem">
+        <input type="text" id="cod-inv" placeholder="Ej: SODA-XXXX" style="flex:1;text-transform:uppercase;letter-spacing:0.1em">
+        <button type="button" onclick="validarCodigo()" id="btn-cod" class="btn-s" style="white-space:nowrap;clip-path:none;padding:0 1.2rem;font-size:0.8rem">Validar</button>
+      </div>
+      <div class="ferr" id="e-cod">Código inválido o ya utilizado</div>
+    </div>
+    <div id="cod-ok" style="display:none;color:var(--verde);font-size:0.85rem;padding:0.5rem 0;margin-bottom:1rem">✓ Código válido. Podés continuar.</div>
+    <div class="btnrow"><button class="btn-s" onclick="ir(2)">Siguiente →</button></div>
+  </div>
+
+  <!-- PASO 2 — COBERTURA Y DIRECCIÓN -->
+  <div class="step" id="paso-2">
     <div class="sbox" style="border-left-color:var(--azul)">
       <h4 style="color:var(--azul)">¿Llegamos a tu zona?</h4>
       <p>Ingresá tu dirección para verificar si tenemos cobertura en tu barrio antes de continuar.</p>
@@ -195,30 +213,31 @@ textarea { resize:vertical; min-height:90px; }
     <div class="btnrow"><button class="btn-s" onclick="ir(2)">Siguiente →</button></div>
   </div>
 
-  <!-- PASO 2 — TÉRMINOS Y CONDICIONES -->
-  <div class="step" id="paso-2">
+  <!-- PASO 3 — TÉRMINOS Y CONDICIONES -->
+  <div class="step" id="paso-3">
     <div class="tyc-box">
       <h4>Términos y Condiciones — La Sodería ATR</h4>
       <p><strong>1. El servicio</strong><br>La Sodería ATR provee soda carbonatada en sifones retornables a domicilio en Lima Metropolitana. El cliente no adquiere los sifones ni los cajones en propiedad — los recibe en préstamo bajo depósito (seña).</p>
-      <p><strong>2. La seña (depósito)</strong><br>Al activar su cuenta, el cliente abona una seña de S/ 5 por cada sifón y S/ 20 por cada cajón, resultando en S/ 50 por cajón completo. Esta seña es un depósito en garantía y será devuelta íntegramente al momento de la devolución de los equipos en buen estado.</p>
+      <p><strong>2. La seña (depósito)</strong><br>Al activar su cuenta, el cliente abona una seña de S/ 85 por cajón completo (6 sifones). Este monto incluye la primera recarga de soda (valorizada en S/ 33). La seña es un depósito en garantía: al momento de la devolución de los equipos en buen estado, se reintegran S/ 52 por cajón.</p>
       <p><strong>3. Costo real del equipo</strong><br>El valor real de cada sifón es de USD 20 y el cajón USD 80, totalizando USD 200 por cajón. En caso de no devolución, el cliente deberá abonar la diferencia entre la seña y el costo real según el tipo de cambio vigente.</p>
-      <p><strong>4. Regla de inactividad</strong><br>Si el cliente no realiza ningún pedido durante 45 días corridos, La Sodería ATR coordinará la devolución de los equipos y reintegrará la seña en un plazo máximo de 7 días hábiles.</p>
-      <p><strong>5. Pedidos y entregas</strong><br>Los pedidos se realizan por WhatsApp desde el número registrado. El cobro de cada recarga lo realiza el repartidor en efectivo al momento de la entrega.</p>
-      <p><strong>6. Cantidad máxima</strong><br>Sin autorización especial, cada cliente puede tener hasta 2 cajones simultáneamente.</p>
-      <p><strong>7. Cancelación</strong><br>El cliente puede cancelar con 7 días de anticipación, coordinando la devolución y restitución de la seña.</p>
-      <p><strong>8. Protección de datos</strong><br>Los datos son recopilados exclusivamente para la prestación del servicio, en cumplimiento con la Ley N° 29733. No serán utilizados con fines de marketing ni compartidos con terceros sin consentimiento expreso.</p>
+      <p><strong>4. Regla de la primera recarga</strong><br>La seña incluye la primera recarga de soda. Si el cliente no solicita su primera recarga dentro de los 21 días corridos desde la activación de la cuenta, perderá los S/ 33 correspondientes al valor de la recarga, recuperando únicamente S/ 52 al devolver el equipo.</p>
+      <p><strong>5. Regla de inactividad</strong><br>Si el cliente no realiza ningún pedido durante 45 días corridos, La Sodería ATR coordinará la devolución de los equipos y reintegrará S/ 52 por cajón en un plazo máximo de 7 días hábiles.</p>
+      <p><strong>6. Pedidos y entregas</strong><br>Los pedidos se realizan por WhatsApp desde el número registrado. El cobro de cada recarga lo realiza el repartidor en efectivo al momento de la entrega.</p>
+      <p><strong>7. Cantidad máxima</strong><br>Sin autorización especial, cada cliente puede tener hasta 2 cajones simultáneamente.</p>
+      <p><strong>8. Cancelación</strong><br>El cliente puede cancelar con 7 días de anticipación, coordinando la devolución y restitución de la seña.</p>
+      <p><strong>9. Protección de datos</strong><br>Los datos son recopilados exclusivamente para la prestación del servicio, en cumplimiento con la Ley N° 29733. No serán utilizados con fines de marketing ni compartidos con terceros sin consentimiento expreso.</p>
     </div>
     <div class="ferr" id="e-tyc" style="display:none">Debés aceptar ambas casillas para continuar.</div>
     <label class="chk"><input type="checkbox" id="chk-tyc"><span>He leído y acepto los <a href="#">Términos y Condiciones</a>, incluyendo la seña, el costo real del equipo y la regla de los 45 días.</span></label>
     <label class="chk"><input type="checkbox" id="chk-datos"><span>Acepto el tratamiento de mis datos personales conforme a la Ley N° 29733 y confirmo que la información es verídica.</span></label>
     <div class="btnrow">
-      <button class="btn-a" onclick="ir(1)">← Anterior</button>
-      <button class="btn-s" onclick="ir(3)">Siguiente →</button>
+      <button class="btn-a" onclick="ir(3)">← Anterior</button>
+      <button class="btn-s" onclick="ir(5)">Siguiente →</button>
     </div>
   </div>
 
-  <!-- PASO 3 — DATOS PERSONALES -->
-  <div class="step" id="paso-3">
+  <!-- PASO 4 — DATOS PERSONALES -->
+  <div class="step" id="paso-4">
     <div class="row2">
       <div class="fg"><label>Nombre *</label><input type="text" id="nombre" placeholder="Juan"><div class="ferr" id="e-nombre">Ingresá tu nombre</div></div>
       <div class="fg"><label>Apellido *</label><input type="text" id="apellido" placeholder="García"><div class="ferr" id="e-apellido">Ingresá tu apellido</div></div>
@@ -286,13 +305,13 @@ textarea { resize:vertical; min-height:90px; }
     </div>
 
     <div class="btnrow">
-      <button class="btn-a" onclick="ir(2)">← Anterior</button>
-      <button class="btn-s" onclick="ir(4)">Siguiente →</button>
+      <button class="btn-a" onclick="ir(3)">← Anterior</button>
+      <button class="btn-s" onclick="ir(5)">Siguiente →</button>
     </div>
   </div>
 
-  <!-- PASO 4 — PAGO Y VERIFICACIÓN DEL CELULAR -->
-  <div class="step" id="paso-4">
+  <!-- PASO 5 — PAGO Y VERIFICACIÓN DEL CELULAR -->
+  <div class="step" id="paso-5">
     <div class="sbox"><h4>¿Cuántos cajones querés?</h4><p>Cada cajón trae 6 sifones. Podés tener hasta 2 sin autorización especial.</p></div>
     <div class="fg">
       <label>Cantidad de cajones *</label>
@@ -359,7 +378,7 @@ textarea { resize:vertical; min-height:90px; }
     <div class="fg"><label>Notas adicionales (opcional)</label><textarea id="notas" placeholder="Referencia de dirección, portero, horario preferido…"></textarea></div>
 
     <div class="btnrow">
-      <button class="btn-a" onclick="ir(3)">← Anterior</button>
+      <button class="btn-a" onclick="ir(4)">← Anterior</button>
       <button class="btn-s" id="btn-env" onclick="enviar()">Confirmar registro →</button>
       <div class="spin-wrap" id="spin"><div class="spin"></div><span>Guardando…</span></div>
     </div>
@@ -389,6 +408,30 @@ async function cargarZonas() {
 cargarZonas();
 
 let telVerificado = false;
+let codigoValidado = false;
+let codigoInvitacionId = null;
+
+async function validarCodigo() {
+  const cod = $('cod-inv').value.trim().toUpperCase();
+  if (!cod) { $('e-cod').textContent = 'Ingresá un código'; $('e-cod').classList.add('on'); return; }
+  const btn = $('btn-cod');
+  btn.textContent = 'Validando…'; btn.disabled = true;
+  const { data, error } = await sb.from('codigos_invitacion').select('id, usado').eq('codigo', cod).single();
+  if (error || !data) {
+    $('e-cod').textContent = 'Código inválido'; $('e-cod').classList.add('on');
+    btn.textContent = 'Validar'; btn.disabled = false; return;
+  }
+  if (data.usado) {
+    $('e-cod').textContent = 'Este código ya fue utilizado'; $('e-cod').classList.add('on');
+    btn.textContent = 'Validar'; btn.disabled = false; return;
+  }
+  codigoValidado = true;
+  codigoInvitacionId = data.id;
+  $('e-cod').classList.remove('on');
+  $('cod-ok').style.display = 'block';
+  $('cod-inv').readOnly = true;
+  btn.textContent = '✓ Válido'; btn.disabled = true;
+}
 
 function normalizarTel(raw) {
   let t = raw.replace(/\s+/g, '').replace(/[^\d+]/g, '');
@@ -483,7 +526,7 @@ function v(id, fn, eid) {
 function ir(n) {
   if (n > paso && !validar(paso)) return;
   // Al ir al paso 4, mostrar el teléfono en el display
-  if (n === 4) {
+  if (n === 5) {
     const tel = normalizarTel($('tel').value.trim());
     $('tel-display').textContent = tel;
   }
@@ -514,17 +557,20 @@ function previewFile(tipo) {
 
 function validar(n) {
   if (n===1) {
-    let ok = true;
-    if (!dir1OK) { $('e-dir1').classList.add('on'); $('dir1').classList.add('err'); ok=false; }
-    if (!$('distrito').value) { $('e-distrito').classList.add('on'); ok=false; }
-    return ok;
+    if (!codigoValidado) { $('e-cod').textContent = 'Validá el código antes de continuar'; $('e-cod').classList.add('on'); return false; }
+    return true;
   }
   if (n===2) {
+    let ok = true;
+    if (!dir1OK) { $('e-dir1').classList.add('on'); $('dir1').classList.add('err'); ok=false; }
+    return ok;
+  }
+  if (n===3) {
     const ok = $('chk-tyc').checked && $('chk-datos').checked;
     $('e-tyc').style.display = ok ? 'none' : 'block';
     return ok;
   }
-  if (n===3) {
+  if (n===4) {
     let ok = true;
     ok = v('nombre', s=>s.length>=2,'e-nombre') && ok;
     ok = v('apellido', s=>s.length>=2,'e-apellido') && ok;
@@ -538,7 +584,7 @@ function validar(n) {
     if (!$('file-selfie').files[0]) { $('e-selfie').classList.add('on'); ok=false; }
     return ok;
   }
-  if (n===4) {
+  if (n===5) {
     let ok = true;
     if (!$('file-comprobante').files[0]) { $('e-comprobante').classList.add('on'); ok=false; }
     if (!telVerificado) { $('e-tel').textContent = 'Debés verificar tu WhatsApp antes de continuar'; $('e-tel').classList.add('on'); ok=false; }
@@ -556,8 +602,8 @@ function toggle2() {
 
 function calcSena() {
   const c=parseInt($('cajones').value);
-  $('monto').textContent=`S/ ${c*50}`;
-  $('detalle').textContent=`${c} cajón${c>1?'es':''} × S/50 = S/${c*50}`;
+  $('monto').textContent=`S/ ${c*85}`;
+  $('detalle').textContent=`${c} cajón${c>1?'es':''} × S/85 = S/${c*85} (incluye primera recarga)`;
 }
 
 function setDistrito(nombre) {
@@ -634,6 +680,10 @@ async function enviar() {
 
     const {error} = await sb.from('clientes').insert([data]);
     if (error) throw error;
+    // Marcar código de invitación como usado
+    if (codigoInvitacionId) {
+      await sb.from('codigos_invitacion').update({ usado: true, usado_por: data.telefono, usado_en: new Date().toISOString() }).eq('id', codigoInvitacionId);
+    }
 
     $('paso-4').classList.remove('on');
     document.querySelector('.tabs').style.display='none';
